@@ -16,7 +16,15 @@ const active = ref(false)
 
 <template>
   <div id="notif">
-    <v-alert v-model="active" type="info" title="Alert title" variant="tonal" closable @click:close="active = false">
+    <v-alert
+      v-model="active"
+      type="info"
+      rounded="0"
+      color="amber"
+      title="Alert title"
+      closable
+      @click:close="active = false"
+    >
       <template v-slot:title>
         {{ notif.getNotif }}
       </template>
@@ -28,5 +36,6 @@ const active = ref(false)
   bottom: 0;
   width: 100%;
   position: fixed;
+  z-index: 1005;
 }
 </style>

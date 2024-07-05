@@ -1,26 +1,28 @@
 <script lang="ts" setup>
-import type { BandBare } from '@mono/server/src/shared/entities'
+import type { BandMinimal } from '@mono/server/src/shared/entities'
 
 defineProps<{
-  band: BandBare
+  band: BandMinimal
 }>()
 </script>
 
 <template>
-  <div class="bandbox">
-    <h5 class="ml-2 mr-5 text-2xl font-bold">
-      {{ band.name }}
-    </h5>
-    <span>{{ band.description }}</span>
-  </div>
+  <v-card
+    :to="{ name: 'Band', params: { id: band.id } }"
+    variant="outlined"
+    rounded="0"
+    class="band"
+  >
+    <v-card-item>
+      <v-card-title>
+        {{ band.name }}
+      </v-card-title>
+    </v-card-item>
+  </v-card>
 </template>
 
 <style>
-.bandbox {
-  display: flex;
-  align-items: center;
-  border: solid 1px black;
-  padding: 5px;
-  margin: 10px;
+.band:hover {
+  background-color: rgba(139, 5, 5, 0.87);
 }
 </style>

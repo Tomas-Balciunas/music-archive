@@ -6,10 +6,12 @@ import Navi from './components/Navi.vue'
 
 <template>
   <v-app>
-    <v-container>
     <Navi />
-    <RouterView />
-    <NotifComponent />
-  </v-container>
+    <v-main>
+      <v-container>
+        <RouterView />
+      </v-container>
+    </v-main>
   </v-app>
+  <NotifComponent />
 </template>

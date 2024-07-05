@@ -155,7 +155,6 @@ jobs:
                 "DB_USER": "${{ secrets.DB_USER }}",
                 "DB_HOST": "${{ secrets.DB_HOST }}",
                 "ENDPOINT_ID": "${{ secrets.ENDPOINT_ID }}",
-                "DATABASE_URL": "${{ secrets.PROD_DATABASE_URL }}",
                 "TOKEN_KEY": "${{ secrets.TOKEN_KEY }}"
               }
             }

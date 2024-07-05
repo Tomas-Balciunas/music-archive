@@ -20,7 +20,7 @@ function logoutUser() {
       </v-app-bar-nav-icon>
     </template>
 
-    <v-app-bar-title> Welcome to the Music Archive </v-app-bar-title>
+    <v-app-bar-title> <span class="navTitle">Music Archive</span> </v-app-bar-title>
 
     <v-btn v-if="userStore.isLoggedIn" @click.prevent="logoutUser" icon>
       <v-icon>mdi-logout</v-icon>
@@ -36,7 +36,8 @@ function logoutUser() {
       </v-btn>
     </div>
   </v-app-bar>
-  <v-navigation-drawer expand-on-hover rail>
+
+  <v-navigation-drawer class="navi" expand-on-hover rail>
     <v-list>
       <v-list-item
         prepend-avatar="https://icons.veryicon.com/png/o/internet--web/three-body-project-icon/user-126.png"
@@ -67,8 +68,15 @@ function logoutUser() {
       ></v-list-item>
     </v-list>
   </v-navigation-drawer>
-
-  <v-main style="height: 250px"></v-main>
 </template>
 
-<style></style>
+<style>
+.navi {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 18px
+}
+.navTitle {
+  color: #B71C1C;
+  font-size: xx-large;
+}
+</style>

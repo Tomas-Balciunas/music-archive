@@ -51,6 +51,10 @@ const schema = z
         type: z.literal('pg-mem'),
       }),
     ]),
+
+    pagination: z.object({
+      bands: z.coerce.number().positive().min(1).default(8)
+    })
   })
   .readonly()
 
@@ -76,6 +80,9 @@ const config = schema.parse({
     logging: env.DB_LOGGING,
     synchronize: env.DB_SYNC,
   },
+  pagination: {
+    bands: env.PAGINATION_BANDS || 8
+  }
 })
 
 export default config

@@ -12,6 +12,7 @@ export default authProcedure
       .find({
         where: { entity, status: 'pending' },
         select: { id: true, data: true, createdAt: true },
+        order: {createdAt: 'ASC'}
       })
 
     const parsedData = foundRequests.map((r) => {

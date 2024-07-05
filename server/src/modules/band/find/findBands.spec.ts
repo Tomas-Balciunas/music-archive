@@ -15,7 +15,7 @@ it('should find all bands', async () => {
 
   const { find } = createCaller({ db })
 
-  const data = await find()
+  const data = await find(1)
 
   const insertList = bands.map((band) => {
     const { id, name } = band

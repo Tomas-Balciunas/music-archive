@@ -13,14 +13,15 @@ const creates = ref('')
 </script>
 
 <template>
-  <v-tabs v-model="tab" bg-color="primary" align-tabs="center">
+  <v-tabs v-model="tab" class="requests" color="red-darken-4" align-tabs="center">
     <v-tab value="create">create requests</v-tab>
     <v-tab value="update">update requests</v-tab>
   </v-tabs>
 
-  <v-tabs-window v-model="tab">
+  <v-tabs-window class="requests" v-model="tab">
+
     <v-tabs-window-item value="create">
-      <v-tabs v-model="creates" bg-color="primary" align-tabs="center">
+      <v-tabs v-model="creates" color="red-darken-4" align-tabs="center">
         <v-tab value="band">Bands</v-tab>
         <v-tab value="album">Albums</v-tab>
         <v-tab value="artist">Artists</v-tab>
@@ -39,7 +40,7 @@ const creates = ref('')
     </v-tabs-window-item>
 
     <v-tabs-window-item value="update">
-      <v-tabs v-model="updates" bg-color="primary" align-tabs="center">
+      <v-tabs v-model="updates" color="red-darken-4" align-tabs="center">
         <v-tab value="band">Bands</v-tab>
         <v-tab value="album">Albums</v-tab>
         <v-tab value="artist">Artists</v-tab>
@@ -58,3 +59,10 @@ const creates = ref('')
     </v-tabs-window-item>
   </v-tabs-window>
 </template>
+
+<style>
+.requests {
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+  font-size: 20px
+}
+</style>

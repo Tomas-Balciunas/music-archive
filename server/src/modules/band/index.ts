@@ -6,6 +6,7 @@ import create from './create'
 import update from './update'
 import status from './status'
 import getMinimal from './get/minimal'
+import count from './count'
 
 export default router({
   get,
@@ -15,4 +16,5 @@ export default router({
   create,
   update,
   status,
+  count
 })

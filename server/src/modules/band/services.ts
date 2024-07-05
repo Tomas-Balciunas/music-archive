@@ -1,3 +1,4 @@
+import config from '@server/config'
 import { BAND_NOT_FOUND } from '@server/consts'
 import { Artist, Band } from '@server/entities'
 import {
@@ -6,6 +7,7 @@ import {
   type BandFull,
   type BandUpdate,
 } from '@server/entities/band'
+import { getPaginationOffset } from '@server/utils'
 import { TRPCError } from '@trpc/server'
 import { DataSource, In } from 'typeorm'
 
@@ -94,10 +96,19 @@ export async function getBandMinimal(
   return band
 }
 
-export async function findBandsMinimal(db: DataSource): Promise<BandMinimal[]> {
+export async function findBandsMinimal(
+  db: DataSource,
+  page: number
+): Promise<BandMinimal[]> {
+  const limit: number = config.pagination.bands
+  const offset: number = getPaginationOffset(page, limit)
+
   const bands: BandMinimal[] = await db.getRepository(Band).find({
     select: { id: true, name: true },
-    where: { pending: false }
+    where: { pending: false },
+    skip: offset,
+    take: limit,
+    order: {name: 'ASC'}
   })
 
   return bands

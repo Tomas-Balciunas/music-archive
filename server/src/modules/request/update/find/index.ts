@@ -20,6 +20,7 @@ export default authProcedure
         'request_update.created_at as created_at',
         eLower,
       ])
+      .orderBy('created_at')
       .getRawMany()
 
     return foundRequests

@@ -21,6 +21,9 @@ const vuetify = createVuetify({
     ...components
   },
   directives,
+  theme: {
+    defaultTheme: 'dark'
+  }
 })
 
 const app = createApp(App)

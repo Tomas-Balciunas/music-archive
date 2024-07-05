@@ -2,31 +2,47 @@
 import { onBeforeMount, ref } from 'vue'
 import type { BandMinimal } from '@mono/server/src/shared/entities'
 import { trpc } from '@/trpc'
+import Band from '@/components/Band.vue'
 
 const bands = ref<BandMinimal[]>([])
+const length = ref(1)
+const page = ref(1)
+
+async function fetchBands() {
+  length.value = await trpc.band.count.query()
+  bands.value = await trpc.band.find.query(page.value)
+}
 
 onBeforeMount(async () => {
-  bands.value = await trpc.band.find.query()
+  await fetchBands()
 })
-
 </script>
 
 <template>
-  <div>
-    <h3>Bands:</h3>
-    <div v-if="bands.length">
-      <RouterLink
-        v-for="b in bands"
-        :key="b.id"
-        :to="{ name: 'Band', params: { id: b.id } }"
-        ><v-card hover class="bandList" color="indigo-darken-3">
-          <v-card-item>
-            <v-card-title>
-              <span>{{ b.name }}</span>
-            </v-card-title>
-          </v-card-item>
-        </v-card></RouterLink>
+  <h2 class="text-center mb-5">LIST OF BANDS</h2>
+  <div v-if="bands.length">
+    <v-row v-for="entry in bands" :key="entry.id">
+      <v-col cols="12">
+        <Band :band="entry" />
+      </v-col>
+    </v-row>
+
+    <div class="text-center">
+      <v-container>
+        <v-row justify="center">
+          <v-col cols="8">
+            <v-container class="max-width">
+              <v-pagination
+                @click.prevent="fetchBands()"
+                v-model="page"
+                :length="length"
+                class="my-4"
+              ></v-pagination>
+            </v-container>
+          </v-col>
+        </v-row>
+      </v-container>
     </div>
-    <h5 v-else>No bands found.</h5>
   </div>
+  <h5 v-else>No bands found.</h5>
 </template>
