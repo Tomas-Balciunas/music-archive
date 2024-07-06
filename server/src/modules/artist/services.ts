@@ -36,6 +36,10 @@ export async function getArtist(
 ): Promise<ArtistFull> {
   const artist = (await db.getRepository(Artist).findOne({
     where: { id },
+    relations: {
+      bands: true,
+      albums: true
+    }
   })) as ArtistFull
 
   if (!artist) {

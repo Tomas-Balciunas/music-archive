@@ -1,5 +1,6 @@
 body {
     font-family: 'Wallpoet';font-size: 25px; font-weight: normal;
+    height: 100%;
 }
 
 a:link {
@@ -17,3 +18,11 @@ a:hover {
 a:active {
     text-decoration: none;
 }
+
+.band-status-active {
+    color: green;
+}
+
+.lists:hover {
+    background-color: rgba(139, 5, 5, 0.87);
+  }

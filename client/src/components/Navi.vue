@@ -11,7 +11,7 @@ function logoutUser() {
 </script>
 
 <template>
-  <v-app-bar scroll-behavior="hide" :elevation="2">
+  <v-app-bar :elevation="2">
     <template v-slot:prepend>
       <v-app-bar-nav-icon>
         <v-btn :to="{ name: 'Home' }" :active="false" icon>

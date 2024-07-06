@@ -36,6 +36,7 @@ onBeforeMount(async () => {
                 @click.prevent="fetchBands()"
                 v-model="page"
                 :length="length"
+                :total-visible="7"
                 class="my-4"
               ></v-pagination>
             </v-container>

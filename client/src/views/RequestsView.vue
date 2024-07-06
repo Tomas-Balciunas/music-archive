@@ -13,56 +13,57 @@ const creates = ref('')
 </script>
 
 <template>
-  <v-tabs v-model="tab" class="requests" color="red-darken-4" align-tabs="center">
-    <v-tab value="create">create requests</v-tab>
-    <v-tab value="update">update requests</v-tab>
-  </v-tabs>
+  <v-container>
+    <v-tabs v-model="tab" class="requests" color="red-darken-4" align-tabs="center">
+      <v-tab value="create">create requests</v-tab>
+      <v-tab value="update">update requests</v-tab>
+    </v-tabs>
 
-  <v-tabs-window class="requests" v-model="tab">
+    <v-tabs-window class="requests" v-model="tab">
+      <v-tabs-window-item value="create">
+        <v-tabs v-model="creates" color="red-darken-4" align-tabs="center">
+          <v-tab value="band">Bands</v-tab>
+          <v-tab value="album">Albums</v-tab>
+          <v-tab value="artist">Artists</v-tab>
+        </v-tabs>
 
-    <v-tabs-window-item value="create">
-      <v-tabs v-model="creates" color="red-darken-4" align-tabs="center">
-        <v-tab value="band">Bands</v-tab>
-        <v-tab value="album">Albums</v-tab>
-        <v-tab value="artist">Artists</v-tab>
-      </v-tabs>
+        <v-tabs-window v-model="creates">
+          <v-tabs-window-item value="band"><BandPendingList></BandPendingList></v-tabs-window-item>
 
-      <v-tabs-window v-model="creates">
-        <v-tabs-window-item value="band"><BandPendingList></BandPendingList></v-tabs-window-item>
+          <v-tabs-window-item value="album">
+            <AlbumCreateList></AlbumCreateList>
+          </v-tabs-window-item>
+          <v-tabs-window-item value="artist"
+            ><ArtistCreateList></ArtistCreateList
+          ></v-tabs-window-item>
+        </v-tabs-window>
+      </v-tabs-window-item>
 
-        <v-tabs-window-item value="album">
-          <AlbumCreateList></AlbumCreateList>
-        </v-tabs-window-item>
-        <v-tabs-window-item value="artist"
-          ><ArtistCreateList></ArtistCreateList
-        ></v-tabs-window-item>
-      </v-tabs-window>
-    </v-tabs-window-item>
+      <v-tabs-window-item value="update">
+        <v-tabs v-model="updates" color="red-darken-4" align-tabs="center">
+          <v-tab value="band">Bands</v-tab>
+          <v-tab value="album">Albums</v-tab>
+          <v-tab value="artist">Artists</v-tab>
+        </v-tabs>
 
-    <v-tabs-window-item value="update">
-      <v-tabs v-model="updates" color="red-darken-4" align-tabs="center">
-        <v-tab value="band">Bands</v-tab>
-        <v-tab value="album">Albums</v-tab>
-        <v-tab value="artist">Artists</v-tab>
-      </v-tabs>
+        <v-tabs-window v-model="updates">
+          <v-tabs-window-item value="band"><BandUpdateList></BandUpdateList></v-tabs-window-item>
 
-      <v-tabs-window v-model="updates">
-        <v-tabs-window-item value="band"><BandUpdateList></BandUpdateList></v-tabs-window-item>
-
-        <v-tabs-window-item value="album">
-          <AlbumUpdateList></AlbumUpdateList>
-        </v-tabs-window-item>
-        <v-tabs-window-item value="artist"
-          ><ArtistUpdateList></ArtistUpdateList
-        ></v-tabs-window-item>
-      </v-tabs-window>
-    </v-tabs-window-item>
-  </v-tabs-window>
+          <v-tabs-window-item value="album">
+            <AlbumUpdateList></AlbumUpdateList>
+          </v-tabs-window-item>
+          <v-tabs-window-item value="artist"
+            ><ArtistUpdateList></ArtistUpdateList
+          ></v-tabs-window-item>
+        </v-tabs-window>
+      </v-tabs-window-item>
+    </v-tabs-window>
+  </v-container>
 </template>
 
 <style>
 .requests {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-  font-size: 20px
+  font-size: 20px;
 }
 </style>

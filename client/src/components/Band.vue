@@ -11,7 +11,7 @@ defineProps<{
     :to="{ name: 'Band', params: { id: band.id } }"
     variant="outlined"
     rounded="0"
-    class="band"
+    class="lists"
   >
     <v-card-item>
       <v-card-title>
@@ -22,7 +22,4 @@ defineProps<{
 </template>
 
 <style>
-.band:hover {
-  background-color: rgba(139, 5, 5, 0.87);
-}
 </style>

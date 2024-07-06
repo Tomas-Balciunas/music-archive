@@ -18,6 +18,9 @@ export class Band extends BandClean {
   @Column('bool', { default: true })
   pending: boolean
 
+  @Column('text', { default: 'active' })
+  status: string
+
   @CreateDateColumn()
   createdAt: Date
 
