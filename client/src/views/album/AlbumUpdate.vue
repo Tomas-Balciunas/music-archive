@@ -2,13 +2,18 @@
 import { trpc } from '@/trpc'
 import { onBeforeMount, ref } from 'vue'
 import type { ArtistBare, SongInsert } from '@mono/server/src/shared/entities'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { tryCatch } from '@/composables'
+import { useUserStore } from '@/stores/user'
+import { useNotifStore } from '@/stores/notif'
 
 const album = ref()
+const userStore = useUserStore()
+const notifStore = useNotifStore()
 const currentArtists = ref()
 const currentSongs = ref()
 const route = useRoute()
+const router = useRouter()
 const albumId = Number(route.params.id)
 
 const searchResults = ref<ArtistBare[]>([])
@@ -48,23 +53,38 @@ const toMinutes = (duration: number) => {
 }
 
 const addArtist = async (artistId: number, name: string) => {
-  searchForm.value = ''
-  searchResults.value = []
-  artistList.value.push({ id: artistId, name })
-}
+  const a = { id: artistId, name }
 
-const search = async () => {
-  if (searchForm.value === '') {
-    searchResults.value = []
+  if (!artistList.value.some((e) => e.id === a.id)) {
+    artistList.value.push(a)
   } else {
-    searchResults.value = await trpc.artist.search.query({ name: searchForm.value, albumId })
+    notifStore.showNotif('This artist has already been added!')
   }
 }
 
+const search = async () => {
+  tryCatch(async () => {
+    if (searchForm.value === '') {
+      searchResults.value = []
+    } else {
+      searchResults.value = await trpc.artist.search.query({ name: searchForm.value, albumId })
+    }
+  })
+}
+
 function submitChanges() {
-  //   if (album.value) {
-  //     trpc.album.update.mutate({ albumId, artists: artistList.value, ...album.value })
-  //   }
+  if (album.value) {
+    tryCatch(async () => {
+      await trpc.album.update.mutate({
+        albumId,
+        songs: songList.value,
+        artists: artistList.value,
+        ...album.value,
+      })
+
+      router.push({ name: 'Album', params: { id: albumId } })
+    })
+  }
 }
 
 function submitRequest() {
@@ -78,102 +98,181 @@ function submitRequest() {
         songs: songList.value,
         info: info.value,
       })
+
+      notifStore.showNotif('Request has been submitted.')
+      router.push({ name: 'Album', params: { id: albumId } })
     })
   }
 }
 
 onBeforeMount(async () => {
-  const { artists, songs, ...data } = await trpc.album.get.query(albumId)
-  currentArtists.value = artists
-  currentSongs.value = songs
-  album.value = data
+  tryCatch(async () => {
+    const { artists, songs, ...data } = await trpc.album.get.query(albumId)
+    currentArtists.value = artists
+    currentSongs.value = songs
+    album.value = data
+  })
 })
 </script>
 
 <template>
-  <div v-if="album">
-    <v-text-field v-model="album.title"></v-text-field>
-    <v-number-input v-model="album.released"></v-number-input>
+  <v-container v-if="album">
+    <v-row>
+      <v-col cols="auto">
+        <RouterLink :to="{ name: 'Album', params: { id: album.id } }">
+          <h2 class="text-amber">{{ album.title }}</h2>
+        </RouterLink>
+      </v-col>
+    </v-row>
 
-    <div class="d-flex">
-        <div>
-            <p v-for="a in currentArtists" :key="a.id">{{ a.name }}</p>
-        </div>
-        <div>
-            <p v-for="s in currentSongs" :key="s.id">{{ s.title }} {{ toMinutes(s.duration) }}</p>
-        </div>
-    </div>
+    <v-row dense>
+      <v-col cols="6">
+        <v-text-field label="Album title" v-model="album.title"></v-text-field>
+      </v-col>
+      <v-col cols="6">
+        <v-number-input label="Released in" v-model="album.released"></v-number-input>
+      </v-col>
+    </v-row>
 
-    <div v-for="a in artistList" :key="a.id">
-      <span>{{ a.name }}</span>
-    </div>
-    <div v-for="s in songList" :key="s.title">
-      <span>{{ s.title }}</span>
-    </div>
+    <v-row dense>
+      <v-col>
+        <v-textarea
+          v-model="info"
+          rows="1"
+          label="Provide source(s) and/or clarification for the changes."
+          variant="solo-filled"
+        ></v-textarea>
+      </v-col>
+    </v-row>
 
-    <div class="d-flex">
-        <div class="borderBox">
-          <p v-for="(a, i) in artistList" :key="a.id">
-            {{ a.name }} <span @click.prevent="removeArtist(i)" class="bg-red">X</span>
-          </p>
-        </div>
+    <v-row>
+      <v-col cols="3">
+        <small>Current artists:</small>
+        <v-card
+          density="compact"
+          rounded="0"
+          variant="plain"
+          v-for="artist in currentArtists"
+          :key="artist.id"
+          :to="{ name: 'Artist', params: { id: artist.id } }"
+          target="_blank"
+          class="lists"
+        >
+          <v-card-title class="pa-0 pl-2">
+            <span class="list-list">{{ artist.name }}</span>
+          </v-card-title>
+        </v-card>
+        <p class="not-found" v-if="!currentArtists.length">No artists found.</p>
 
-        <div class="borderBox">
-          <p v-for="(s, i) in songList" :key="i">
-            {{ s.title }} {{ toMinutes(s.duration) }}
-            <span @click.prevent="removeSong(i)" class="bg-red">X</span>
-          </p>
-        </div>
-      </div>
+        <small>Added artists:</small>
+        <v-card
+          density="compact"
+          rounded="0"
+          variant="plain"
+          v-for="(artist, i) in artistList"
+          :key="artist.id"
+          :to="{ name: 'Artist', params: { id: artist.id } }"
+          target="_blank"
+          class="lists"
+        >
+          <v-card-title class="pa-0 pl-2">
+            <span class="list-list text-green">{{ artist.name }}</span>
+            <v-btn density="compact" icon class="ml-2" @click.prevent="removeArtist(i)">X</v-btn>
+          </v-card-title>
+        </v-card>
+      </v-col>
 
-    <v-textarea
-      v-model="info"
-      label="Provide source(s) and/or clarification for the changes."
-      variant="solo-filled"
-    ></v-textarea>
+      <v-col cols="3">
+        <v-text-field
+          append-inner-icon="mdi-magnify"
+          label="Search for artists"
+          variant="solo-filled"
+          v-model="searchForm"
+          @click:append-inner="search"
+          clearable
+          @click:clear="searchResults = []"
+        />
 
-    <v-btn @click.prevent="submitChanges()">Update</v-btn>
-    <v-btn @click.prevent="submitRequest()">Submit</v-btn>
+        <v-card
+          density="compact"
+          rounded="0"
+          variant="text"
+          v-for="artist in searchResults"
+          :key="artist.id"
+        >
+          <v-card-title class="pa-0 pl-2"
+            ><v-btn
+              density="compact"
+              color="green"
+              icon
+              class="mb-1 mr-2"
+              @click="addArtist(artist.id, artist.name)"
+              >+</v-btn
+            >
+            <span>{{ artist.name }}</span>
+          </v-card-title>
+        </v-card>
+      </v-col>
 
-    <div class="d-flex">
-      <div class="borderBox createBox">
-        <p class="text-center">Add artist</p>
-        <div>
-          <v-text-field
-            label="Search for artists"
-            variant="solo-filled"
-            v-model="searchForm"
-            @update:model-value="search"
-          />
-        </div>
+      <v-col cols="3">
+        <small>Current songs:</small>
+        <v-card
+          density="compact"
+          rounded="0"
+          variant="plain"
+          v-for="song in currentSongs"
+          :key="song.id"
+        >
+          <v-card-title class="pa-0 pl-2">
+            <span class="list-list">{{ song.title }} {{ toMinutes(song.duration) }}</span>
+          </v-card-title>
+        </v-card>
+        <p class="not-found" v-if="!currentSongs.length">No songs found.</p>
 
-        <div v-for="artist in searchResults" :key="artist.id">
-          <span>{{ artist.name }}</span>
-          <v-btn type="button" color="#C62828" @click="addArtist(artist.id, artist.name)">+</v-btn>
-        </div>
-      </div>
+        <small>Added songs:</small>
+        <v-card
+          density="compact"
+          rounded="0"
+          variant="plain"
+          v-for="(song, i) in songList"
+          :key="song.title"
+        >
+          <v-card-title class="pa-0 pl-2">
+            <span class="list-list text-green"
+              >{{ song.title }} {{ toMinutes(song.duration) }}</span
+            >
+            <v-btn density="compact" icon class="ml-2" @click.prevent="removeSong(i)">X</v-btn>
+          </v-card-title>
+        </v-card>
+      </v-col>
 
-      <div class="borderBox createBox">
-        <p class="text-center">Add song</p>
-        <div>
-          <v-text-field label="Song title" variant="solo-filled" v-model="songForm.title" />
-        </div>
-        <div class="timeBox">
-          <v-text-field
-            type="number"
-            label="Minutes"
-            variant="solo-filled"
-            v-model="songForm.minutes"
-          />
-          <v-text-field
-            type="number"
-            label="Seconds"
-            variant="solo-filled"
-            v-model="songForm.seconds"
-          />
-        </div>
-        <v-btn @click.prevent="addSong" type="submit" color="#C62828">Save</v-btn>
-      </div>
-    </div>
-  </div>
+      <v-col cols="3">
+        <v-text-field label="Song title" variant="solo-filled" v-model="songForm.title" clearable />
+        <v-text-field
+          type="number"
+          label="Minutes"
+          variant="solo-filled"
+          v-model="songForm.minutes"
+        />
+        <v-text-field
+          type="number"
+          label="Seconds"
+          variant="solo-filled"
+          v-model="songForm.seconds"
+        />
+        <v-btn @click.prevent="addSong" type="submit" color="#00897B">Add song</v-btn>
+      </v-col>
+    </v-row>
+
+    <v-row justify="center">
+      <v-col cols="auto">
+        <v-btn v-if="userStore.isAdmin" color="#00897B" @click.prevent="submitChanges()"
+          >Update</v-btn
+        >
+      </v-col>
+      <v-col cols="auto">
+        <v-btn color="#00897B" @click.prevent="submitRequest()">Submit request</v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>

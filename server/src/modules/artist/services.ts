@@ -32,14 +32,12 @@ export async function createArtist(
 
 export async function getArtist(
   id: number,
-  db: DataSource
+  db: DataSource,
+  relations: string[] = []
 ): Promise<ArtistFull> {
   const artist = (await db.getRepository(Artist).findOne({
     where: { id },
-    relations: {
-      bands: true,
-      albums: true
-    }
+    relations
   })) as ArtistFull
 
   if (!artist) {

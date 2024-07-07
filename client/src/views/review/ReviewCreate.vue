@@ -24,18 +24,19 @@ const createReview = () => {
 }
 
 onBeforeMount(async () => {
-  const result = await trpc.album.reviewData.query(albumId)
-  info.value = result
+  tryCatch(async () => {
+    info.value = await trpc.album.reviewData.query(albumId)
+  })
 })
 </script>
 
 <template>
   <div v-if="info">
     <RouterLink :to="{ name: 'Album', params: { id: albumId } }"
-      ><h1>{{ info.title }}</h1></RouterLink
+      ><h1 class="text-amber">{{ info.title }}</h1></RouterLink
     >
     <RouterLink :to="{ name: 'Band', params: { id: info.band.id } }"
-      ><h2>{{ info.band.name }}</h2></RouterLink
+      ><h2 class="text-amber">{{ info.band.name }}</h2></RouterLink
     >
 
     <form @submit.prevent="createReview">
@@ -49,7 +50,7 @@ onBeforeMount(async () => {
         prefix="%"
         v-model="reviewForm.score"
       ></VNumberInput>
-      <v-btn type="submit" color="#C62828">Submit review</v-btn>
+      <v-btn type="submit" color="#00897B">Submit review</v-btn>
     </form>
   </div>
 </template>

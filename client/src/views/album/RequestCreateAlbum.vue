@@ -27,48 +27,79 @@ const approveChanges = async () => {
       songs: r.value.data.songs,
       entity: r.value.entity,
     })
-    
-    router.push({name: 'Requests'})
+
+    router.push({ name: 'Requests' })
   })
 }
 
 const rejectChanges = async () => {
-  await trpc.request.create.reject.mutate(rId)
+  tryCatch(async () => {
+    await trpc.request.create.reject.mutate(rId)
+    router.push({ name: 'Requests' })
+  })
 }
 
 onBeforeMount(async () => {
-  r.value = await trpc.request.create.get.query(rId)
-  b.value = await trpc.band.get.query(r.value.data.bandId)
+  tryCatch(async () => {
+    r.value = await trpc.request.create.get.query(rId)
+    b.value = await trpc.band.get.query(r.value.data.bandId)
+  })
 })
 </script>
 
 <template>
-  <div v-if="r && b">
+  <v-container v-if="r && b">
     <h2>
-      <RouterLink :to="{ name: 'Band', params: { id: b.id } }">{{ b.name }}</RouterLink>
+      <RouterLink :to="{ name: 'Band', params: { id: b.id } }"
+        ><span class="text-amber">{{ b.name }}</span></RouterLink
+      >
     </h2>
-    <h3>title: {{ r.data.title }}</h3>
-    <h3>released in: {{ r.data.released }}</h3>
-    <div v-if="r.data.artists.length">
-      <h4>artists:</h4>
-      <div v-for="a in r.data.artists" :key="a.id">
-        <RouterLink :to="{ name: 'Artist', params: { id: a.id } }"
-          ><p>
-            <span>{{ a.name }}</span>
-          </p></RouterLink
-        >
-      </div>
-    </div>
+    <p>Album data:</p>
+    <v-container>
+      <v-card variant="text" rounded="0">
+        <v-card-item>
+          <v-card-title> Title: {{ r.data.title }} </v-card-title>
+          <v-card-title> Released in: {{ r.data.released }} </v-card-title>
+        </v-card-item>
+      </v-card>
+    </v-container>
 
-    <div v-if="r.data.songs.length">
-      <h4>songs:</h4>
-      <p v-for="s in r.data.songs" :key="s.id">{{ s.title }} {{ toMinutes(s.duration) }}</p>
-    </div>
+    <v-container v-if="r.data.artists.length">
+      <p>Artists:</p>
+      <v-card
+        variant="text"
+        rounded="0"
+        class="lists"
+        :to="{ name: 'Artist', params: { id: artist.id } }"
+        v-for="artist in r.data.artists"
+        :key="artist.id"
+      >
+        <v-card-item>
+          <v-card-title> {{ artist.name }} </v-card-title>
+        </v-card-item>
+      </v-card>
+    </v-container>
+
+    <v-container v-if="r.data.songs.length">
+      <p>songs:</p>
+      <v-card variant="text" rounded="0" class="lists" v-for="song in r.data.songs" :key="song.id">
+        <v-card-item>
+          <v-card-title> {{ song.title }} {{ toMinutes(song.duration) }} </v-card-title>
+        </v-card-item>
+      </v-card>
+    </v-container>
     <div>
-      <h4>Sources/explanation:</h4>
+      <p>Sources:</p>
       <p>{{ r.info }}</p>
     </div>
-    <v-btn @click.prevent="approveChanges">Approve</v-btn>
-    <v-btn @click.prevent="rejectChanges">Reject</v-btn>
-  </div>
+
+    <v-row justify="center">
+      <v-col cols="auto">
+        <v-btn color="#00897B" @click.prevent="approveChanges()">Approve</v-btn>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn color="#00897B" @click.prevent="rejectChanges()">Reject</v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>

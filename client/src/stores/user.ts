@@ -13,6 +13,7 @@ export const useUserStore = defineStore('user', () => {
   const authToken = ref(getStoredAccessToken(localStorage))
   const authUserId = computed(() => (authToken.value ? getUserIdFromToken(authToken.value) : null))
   const isLoggedIn = computed(() => !!authToken.value)
+  const isAdmin = computed(() => userIdentifier.value?.role === 2)
 
   const userIdentifier = ref<IdentifierUser | null>()
 
@@ -51,6 +52,7 @@ export const useUserStore = defineStore('user', () => {
   return {
     authUserId,
     isLoggedIn,
+    isAdmin,
     userIdentifier,
     login,
     logout,

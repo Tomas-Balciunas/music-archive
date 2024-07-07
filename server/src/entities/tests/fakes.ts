@@ -52,7 +52,8 @@ export const fakeArtist = <T extends Partial<Artist>>(
 ) => ({
   id: randomId(),
   name: random.string(),
-  birth: random.date(),
+  birth: '1999-12-31',
+  origin: 'Country',
   ...overrides,
 })
 

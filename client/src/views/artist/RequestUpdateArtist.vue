@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { tryCatch } from '@/composables'
 import { trpc } from '@/trpc'
 import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -9,16 +10,22 @@ const r = ref()
 const a = ref()
 
 const approveChanges = async () => {
-  await trpc.request.update.approve.mutate({id: r.value.id, entity: 'ARTIST'})
+  tryCatch(async () => {
+    await trpc.request.update.approve.mutate({ id: r.value.id, entity: 'ARTIST' })
+  })
 }
 
 const rejectChanges = async () => {
-  await trpc.request.update.reject.mutate(rId)
+  tryCatch(async () => {
+    await trpc.request.update.reject.mutate(rId)
+  })
 }
 
 onBeforeMount(async () => {
-  r.value = await trpc.request.update.get.query(rId)
-  a.value = await trpc.artist.get.query(r.value.entityId)
+  tryCatch(async () => {
+    r.value = await trpc.request.update.get.query(rId)
+    a.value = await trpc.artist.get.query(r.value.entityId)
+  })
 })
 </script>
 

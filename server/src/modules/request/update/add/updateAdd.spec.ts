@@ -21,6 +21,7 @@ it('should create an update request', async () => {
     info: 'info',
     name: 'John',
     birth: null,
+    origin: 'Country'
   }
 
   const response = await add(request)

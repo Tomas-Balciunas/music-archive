@@ -17,7 +17,8 @@ it('should create an artist with album link', async () => {
   const artistInsert = {
     name: 'Artist Name',
     birth: null,
-    bandId: band.id
+    bandId: band.id,
+    origin: 'Country'
   }
 
   const artist = await create(artistInsert)

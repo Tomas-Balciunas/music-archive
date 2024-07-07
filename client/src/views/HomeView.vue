@@ -3,14 +3,17 @@ import { onBeforeMount, ref } from 'vue'
 import type { BandMinimal } from '@mono/server/src/shared/entities'
 import { trpc } from '@/trpc'
 import Band from '@/components/Band.vue'
+import { tryCatch } from '@/composables'
 
 const bands = ref<BandMinimal[]>([])
 const length = ref(1)
 const page = ref(1)
 
 async function fetchBands() {
-  length.value = await trpc.band.count.query()
-  bands.value = await trpc.band.find.query(page.value)
+  tryCatch(async () => {
+    length.value = await trpc.band.count.query()
+    bands.value = await trpc.band.find.query(page.value)
+  })
 }
 
 onBeforeMount(async () => {
@@ -19,7 +22,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <h2 class="text-center mb-5">LIST OF BANDS</h2>
+  <h2 class="mb-5 text-center">LIST OF BANDS</h2>
   <div v-if="bands.length">
     <v-row v-for="entry in bands" :key="entry.id">
       <v-col cols="12">

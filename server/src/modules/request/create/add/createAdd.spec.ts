@@ -19,6 +19,7 @@ it('should create an artist create request', async () => {
     info: 'info',
     name: 'John',
     birth: null,
+    origin: 'Country'
   }
 
   const response = await add(request)

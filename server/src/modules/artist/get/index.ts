@@ -5,7 +5,7 @@ import { getArtist } from '../services'
 export default publicProcedure
   .input(artistSchema.shape.id)
   .query(async ({ input: id, ctx: { db } }) => {
-    const artist = await getArtist(id, db)
+    const artist = await getArtist(id, db, ['bands', 'albums'])
 
     return artist
   })

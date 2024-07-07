@@ -26,3 +26,12 @@ a:active {
 .lists:hover {
     background-color: rgba(139, 5, 5, 0.87);
   }
+
+  .list-list {
+    font-size: 0.9rem;
+  }
+
+  .not-found {
+    font-size: 0.9rem;
+    color: dimgray;
+  }

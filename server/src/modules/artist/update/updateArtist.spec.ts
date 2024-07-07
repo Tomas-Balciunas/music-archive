@@ -17,6 +17,7 @@ it('should update an artist', async () => {
         id: artist.id,
         name: 'Test',
         birth: null,
+        origin: 'Country'
       }
 
     const updatedArtist = await update(data)

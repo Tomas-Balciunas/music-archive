@@ -18,22 +18,30 @@ const postForm = ref({
 
 const postInsert: Ref<PostInsert> = makeInsert(postForm.value, { bandId })
 
-const createComment = () => {
+const createComment = async () => {
   tryCatch(async () => {
     await trpc.post.create.mutate(postInsert.value)
-    await updateBand()
   })
+
+  await updateBand()
 }
 
 const approveBand = async () => {
   if (band.value) {
-    await trpc.band.status.mutate({ id: band.value.id, pending: false })
+    const bandValue = band.value
+
+    tryCatch(async () => {
+      await trpc.band.status.mutate({ id: bandValue.id, pending: false })
+    })
+
     router.push({ name: 'Requests' })
   }
 }
 
 const updateBand = async () => {
-  band.value = await trpc.band.get.query(bandId)
+  tryCatch(async () => {
+    band.value = await trpc.band.get.query(bandId)
+  })
 }
 
 const tab = ref('')
@@ -49,8 +57,8 @@ onBeforeMount(async () => {
       <h1 class="text-amber">{{ band.name }}</h1>
 
       <div>
-        <v-btn :to="{ name: 'BandUpdate', params: { id: bandId } }">Update</v-btn>
-        <v-btn v-if="band.pending" @click.prevent="approveBand">Approve</v-btn>
+        <v-btn class="mr-2" color="#00897B" :to="{ name: 'BandUpdate', params: { id: bandId } }">Update</v-btn>
+        <v-btn color="#00897B" v-if="band.pending" @click.prevent="approveBand">Approve</v-btn>
       </div>
     </v-row>
 
@@ -97,11 +105,17 @@ onBeforeMount(async () => {
               <v-card-title> {{ album.title }} ({{ album.released }}) </v-card-title>
             </v-card-item>
           </v-card>
-          <v-btn class="mt-4" :to="{ name: 'AlbumCreate', params: { id: bandId } }">
+        </v-container>
+        <v-container v-else>
+          <v-col>
+            <p>No albums found.</p>
+          </v-col>
+        </v-container>
+        <v-container>
+          <v-btn color="#00897B" class="mt-4" :to="{ name: 'AlbumCreate', params: { id: bandId } }">
             Add album
           </v-btn>
         </v-container>
-        <h5 v-else>No albums found.</h5>
       </v-tabs-window-item>
 
       <v-tabs-window-item value="artists">
@@ -119,7 +133,11 @@ onBeforeMount(async () => {
             </v-card-item>
           </v-card>
         </v-container>
-        <h5 v-else>No artists found.</h5>
+        <v-container v-else>
+          <v-col>
+            <p>No artists found.</p>
+          </v-col>
+        </v-container>
       </v-tabs-window-item>
     </v-tabs-window>
 
@@ -141,7 +159,7 @@ onBeforeMount(async () => {
         </v-card-title>
       </v-card>
     </v-container>
-    <v-row>
+    <v-row v-else>
       <v-col>
         <small>No comments found.</small>
       </v-col>

@@ -3,10 +3,12 @@ import { trpc } from '@/trpc'
 import { useRoute } from 'vue-router'
 import { onBeforeMount, ref } from 'vue'
 import { type AlbumFull } from '@mono/server/src/shared/entities'
+import { tryCatch } from '@/composables'
 
 const route = useRoute()
 const album = ref<AlbumFull>()
 const albumId = Number(route.params.id)
+const tab = ref('')
 
 const toMinutes = (duration: number) => {
   const min = Math.floor(duration / 60)
@@ -16,7 +18,9 @@ const toMinutes = (duration: number) => {
 }
 
 const updateAlbum = async () => {
-  album.value = await trpc.album.get.query(albumId)
+  tryCatch(async () => {
+    album.value = await trpc.album.get.query(albumId)
+  })
 }
 
 onBeforeMount(async () => {
@@ -25,59 +29,111 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div v-if="album">
-    <RouterLink :to="{ name: 'AlbumUpdate', params: { id: albumId } }"
-      ><v-btn>Update</v-btn></RouterLink
-    >
-    <div class="borderBox">
-      <h1>{{ album.title }}</h1>
-      <RouterLink :to="{ name: 'Band', params: { id: album.bandId } }">
-        <h3>{{ album.band.name }}</h3>
-      </RouterLink>
-      <h4>{{ album.released }}</h4>
-    </div>
+  <v-container v-if="album">
+    <v-row align-sm="center" justify="space-between">
+      <h1 class="text-amber">{{ album.title }}</h1>
 
-    <div class="borderBox">
-      <h3>Artists:</h3>
-      <div v-if="album.artists.length">
-        <div v-for="artist in album.artists" :key="artist.id">
-          <RouterLink :to="{ name: 'Artist', params: { id: artist.id } }">
-            <p>{{ artist.name }}</p>
-          </RouterLink>
-        </div>
+      <div>
+        <v-btn :to="{ name: 'AlbumUpdate', params: { id: albumId } }">Update</v-btn>
       </div>
-    </div>
+    </v-row>
 
-    <div class="borderBox">
-      <h3>Song list:</h3>
-      <div v-if="album.songs.length">
-        <p v-for="song in album.songs" :key="song.id">
-          {{ song.title }} {{ toMinutes(song.duration) }}
-        </p>
-      </div>
-      <h5 v-else>No songs found</h5>
-    </div>
+    <v-container>
+      <v-card variant="text" rounded="0">
+        <v-card-item>
+          <v-card-title>
+            <RouterLink :to="{ name: 'Band', params: { id: album.bandId } }">
+              <span class="text-amber">← {{ album.band.name }}</span>
+            </RouterLink>
+          </v-card-title>
+          <v-card-title> Released in: {{ album.released }} </v-card-title>
+        </v-card-item>
+      </v-card>
+    </v-container>
 
-    <div class="borderBox">
-      <h3>Reviews:</h3>
-      <div v-if="album.reviews.length">
-        <div v-for="review in album.reviews" :key="review.id">
-          <RouterLink :to="{ name: 'Review', params: { id: review.id } }"
-            ><p>{{ review.score }}% {{ review.title }}</p></RouterLink
+    <v-row class="mt-5">
+      <v-tabs v-model="tab" class="requests" color="amber" align-tabs="center">
+        <v-tab size="large" value="songs">songs</v-tab>
+        <v-tab size="large" value="artists">artists</v-tab>
+      </v-tabs>
+    </v-row>
+
+    <v-tabs-window class="requests" v-model="tab">
+      <v-tabs-window-item value="songs">
+        <v-container v-if="album.songs.length">
+          <v-card
+            variant="text"
+            rounded="0"
+            class="lists"
+            v-for="song in album.songs"
+            :key="song.id"
           >
-        </div>
-      </div>
-      <h5 v-else>No reviews found</h5>
-    </div>
-    <div class="d-flex"></div>
-    <div >
-      <RouterLink :to="{ name: 'ReviewCreate', params: { id: albumId } }">
-        <div class="gap-3">
-          <v-btn type="submit" color="#C62828">Write a review</v-btn>
-        </div>
-      </RouterLink>
-    </div>
-  </div>
+            <v-card-item>
+              <v-card-title> {{ song.title }} {{ toMinutes(song.duration) }} </v-card-title>
+            </v-card-item>
+          </v-card>
+        </v-container>
+        <v-container v-else>
+          <v-col>
+            <p>No songs found.</p>
+          </v-col>
+        </v-container>
+      </v-tabs-window-item>
+
+      <v-tabs-window-item value="artists">
+        <v-container v-if="album.artists.length">
+          <v-card
+            variant="text"
+            rounded="0"
+            class="lists"
+            :to="{ name: 'Artist', params: { id: artist.id } }"
+            v-for="artist in album.artists"
+            :key="artist.id"
+          >
+            <v-card-item>
+              <v-card-title> {{ artist.name }} </v-card-title>
+            </v-card-item>
+          </v-card>
+        </v-container>
+        <v-container v-else>
+          <v-col>
+            <p>No artists found.</p>
+          </v-col>
+        </v-container>
+      </v-tabs-window-item>
+    </v-tabs-window>
+
+    <v-row class="mt-2">
+      <p>Reviews</p>
+    </v-row>
+
+    <v-container v-if="album.reviews.length">
+      <v-card
+        v-for="review in album.reviews"
+        :key="review.id"
+        :to="{ name: 'Review', params: { id: review.id } }"
+        class="lists mb-2 mt-2"
+      >
+        <v-card-item>
+          <v-card-title> {{ review.score }}% {{ review.title }} </v-card-title>
+        </v-card-item>
+      </v-card>
+    </v-container>
+
+    <v-container v-else>
+      <v-row>
+        <v-col>
+          <small>No reviews found.</small>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <v-container>
+      <v-btn :to="{ name: 'ReviewCreate', params: { id: albumId } }" type="submit" color="#00897B">
+        Write a review
+      </v-btn>
+    </v-container>
+  </v-container>
 </template>
 
 <style></style>

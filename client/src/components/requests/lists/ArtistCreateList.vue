@@ -17,7 +17,7 @@ onBeforeMount(async () => {
   <div v-if="r">
     <div v-for="req in r" :key="req.id">
       <RouterLink :to="{ name: 'ArtistCreateReq', params: { id: req.id } }">
-        <v-card class="bandList">
+        <v-card class="mt-2">
           <v-card-item>
             <v-card-title>
               {{ req.data.name }}

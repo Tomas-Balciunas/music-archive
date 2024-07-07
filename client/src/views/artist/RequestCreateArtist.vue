@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { tryCatch } from '@/composables';
 import { trpc } from '@/trpc'
 import { onBeforeMount, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -8,15 +9,21 @@ const rId = Number(route.params.id)
 const r = ref()
 
 const approveChanges = async () => {
-  await trpc.request.create.approve.mutate({ id: rId, entity: 'ARTIST' })
+  tryCatch(async () => {
+    await trpc.request.create.approve.mutate({ id: rId, entity: 'ARTIST' })
+  })
 }
 
 const rejectChanges = async () => {
-  await trpc.request.create.reject.mutate(rId)
+  tryCatch(async () => {
+    await trpc.request.create.reject.mutate(rId)
+  })
 }
 
 onBeforeMount(async () => {
-  r.value = await trpc.request.create.get.query(rId)
+  tryCatch(async () => {
+    r.value = await trpc.request.create.get.query(rId)
+  })
 })
 </script>
 
@@ -24,6 +31,7 @@ onBeforeMount(async () => {
   <div v-if="r">
     <h3>name: {{ r.data.name }}</h3>
     <h3>birth: {{ r.data.birth ?? 'N/A' }}</h3>
+    <h3>country: {{ r.data.origin ?? 'N/A' }}</h3>
     <div>
       <h4>Sources/explanation:</h4>
       <p>{{ r.info }}</p>

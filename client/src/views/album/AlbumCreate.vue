@@ -3,14 +3,17 @@ import { ref } from 'vue'
 import type { ArtistBare, SongInsert } from '@mono/server/src/shared/entities'
 import { tryCatch } from '@/composables'
 import { trpc } from '@/trpc'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { onBeforeMount } from 'vue'
 import { useNotifStore } from '@/stores/notif'
+import { useUserStore } from '@/stores/user'
 
+const userStore = useUserStore()
+const notifStore = useNotifStore()
 const route = useRoute()
+const router = useRouter()
 const bandId = Number(route.params.id)
 const band = ref()
-const notifStore = useNotifStore()
 
 const toSeconds = () => {
   return parseInt(songForm.value.minutes) * 60 + parseInt(songForm.value.seconds)
@@ -41,23 +44,25 @@ const artistList = ref<Pick<ArtistBare, 'id' | 'name'>[]>([])
 const songList = ref<Omit<SongInsert, 'album'>[]>([])
 
 const addArtist = async (artistId: number, name: string) => {
-  searchForm.value = ''
-  searchResults.value = []
-  if (artistList.value.every((a) => a.id !== artistId)) {
-    artistList.value.push({ id: artistId, name })
+  const a = { id: artistId, name }
+
+  if (!artistList.value.some((e) => e.id === a.id)) {
+    artistList.value.push(a)
   } else {
-    notifStore.showNotif('This artist has already been added')
+    notifStore.showNotif('This artist has already been added!')
   }
 }
 const searchResults = ref<ArtistBare[]>([])
 const searchForm = ref('')
 
 const search = async () => {
-  if (searchForm.value === '') {
-    searchResults.value = []
-  } else {
-    searchResults.value = await trpc.artist.search.query({ name: searchForm.value, bandId })
-  }
+  tryCatch(async () => {
+    if (searchForm.value === '') {
+      searchResults.value = []
+    } else {
+      searchResults.value = await trpc.artist.search.query({ name: searchForm.value, bandId })
+    }
+  })
 }
 
 const removeArtist = (i: number) => {
@@ -68,7 +73,20 @@ const removeSong = (i: number) => {
   songList.value.splice(i, 1)
 }
 
-const submitAlbum = () => {
+function createAlbum() {
+  tryCatch(async () => {
+    await trpc.album.create.mutate({
+      songs: songList.value,
+      artists: artistList.value,
+      bandId,
+      ...albumForm.value,
+    })
+
+    router.push({ name: 'Band', params: { id: bandId } })
+  })
+}
+
+const submitRequest = () => {
   tryCatch(async () => {
     await trpc.request.create.add.mutate({
       entity: 'ALBUM',
@@ -78,47 +96,41 @@ const submitAlbum = () => {
       bandId,
       info: 'test',
     })
+
+    notifStore.showNotif('Request has been submitted.')
+    router.push({ name: 'Band', params: { id: bandId } })
   })
 }
 
 onBeforeMount(async () => {
-  band.value = await trpc.band.get.query(bandId)
+  tryCatch(async () => {
+    band.value = await trpc.band.get.query(bandId)
+  })
 })
 </script>
 
 <template>
-  <div v-if="band">
-    <RouterLink :to="{ name: 'Band', params: { id: band.id } }">
-      <h4>{{ band.name }}</h4>
-    </RouterLink>
-    <div>
-      <p class="text-center">Create album</p>
-      <div>
-        <v-text-field label="Album title" variant="solo-filled" v-model="albumForm.title" />
-        <v-number-input
-          type="number"
-          v-model="albumForm.released"
-          variant="solo-filled"
-          placeholder="Year released"
-        />
-      </div>
+  <v-container v-if="band">
+    <v-row>
+      <v-col cols="auto">
+        <RouterLink :to="{ name: 'Band', params: { id: band.id } }">
+          <h2 class="text-amber">{{ band.name }}</h2>
+        </RouterLink>
+      </v-col>
+    </v-row>
 
-      <div class="d-flex">
-        <div class="borderBox">
-          <p v-for="(a, i) in artistList" :key="a.id">
-            {{ a.name }} <span @click.prevent="removeArtist(i)" class="bg-red">X</span>
-          </p>
-        </div>
+    <v-row dense>
+      <v-col cols="6">
+        <v-text-field label="Album title" v-model="albumForm.title"></v-text-field>
+      </v-col>
+      <v-col cols="6">
+        <v-number-input label="Released in" v-model="albumForm.released"></v-number-input>
+      </v-col>
+    </v-row>
 
-        <div class="borderBox">
-          <p v-for="(s, i) in songList" :key="i">
-            {{ s.title }} {{ toMinutes(s.duration) }}
-            <span @click.prevent="removeSong(i)" class="bg-red">X</span>
-          </p>
-        </div>
-      </div>
-      <p>Band line-up:</p>
-      <div v-if="band.artists">
+    <v-row>
+      <v-col cols="3">
+        <small>Band line-up:</small>
         <div v-for="artist in band.artists" :key="artist.id">
           <v-checkbox
             hide-details
@@ -128,34 +140,78 @@ onBeforeMount(async () => {
             :value="{ id: artist.id, name: artist.name }"
           ></v-checkbox>
         </div>
-      </div>
-      <h5 v-else>No artists available</h5>
-    </div>
-  </div>
-  <div class="d-flex">
-    <div class="borderBox createBox">
-      <p class="text-center">Add artist</p>
-      <div>
+        <p class="not-found" v-if="!band.artists.length">No artists found.</p>
+
+        <small>Added artists:</small>
+        <v-card
+          density="compact"
+          rounded="0"
+          variant="plain"
+          v-for="(artist, i) in artistList"
+          :key="artist.id"
+          :to="{ name: 'Artist', params: { id: artist.id } }"
+          target="_blank"
+          class="lists"
+        >
+          <v-card-title class="pa-0 pl-2">
+            <span class="list-list text-green">{{ artist.name }}</span>
+            <v-btn density="compact" icon class="ml-2" @click.prevent="removeArtist(i)">X</v-btn>
+          </v-card-title>
+        </v-card>
+      </v-col>
+
+      <v-col cols="3">
         <v-text-field
+          append-inner-icon="mdi-magnify"
           label="Search for artists"
           variant="solo-filled"
           v-model="searchForm"
-          @update:model-value="search"
+          @click:append-inner="search"
+          clearable
+          @click:clear="searchResults = []"
         />
-      </div>
 
-      <div v-for="artist in searchResults" :key="artist.id">
-        <span>{{ artist.name }}</span>
-        <v-btn type="button" color="#C62828" @click="addArtist(artist.id, artist.name)">+</v-btn>
-      </div>
-    </div>
+        <v-card
+          density="compact"
+          rounded="0"
+          variant="text"
+          v-for="artist in searchResults"
+          :key="artist.id"
+        >
+          <v-card-title class="pa-0 pl-2"
+            ><v-btn
+              density="compact"
+              color="green"
+              icon
+              class="mb-1 mr-2"
+              @click="addArtist(artist.id, artist.name)"
+              >+</v-btn
+            >
+            <span>{{ artist.name }}</span>
+          </v-card-title>
+        </v-card>
+      </v-col>
 
-    <div class="borderBox createBox">
-      <p class="text-center">Add song</p>
-      <div>
-        <v-text-field label="Song title" variant="solo-filled" v-model="songForm.title" />
-      </div>
-      <div class="timeBox">
+      <v-col cols="3">
+        <small>Added songs:</small>
+        <v-card
+          density="compact"
+          rounded="0"
+          variant="plain"
+          v-for="(song, i) in songList"
+          :key="song.title"
+        >
+          <v-card-title class="pa-0 pl-2">
+            <span class="list-list text-green"
+              >{{ song.title }} {{ toMinutes(song.duration) }}</span
+            >
+            <v-btn density="compact" icon class="ml-2" @click.prevent="removeSong(i)">X</v-btn>
+          </v-card-title>
+        </v-card>
+      </v-col>
+
+      <v-col cols="3">
+        <v-text-field label="Song title" variant="solo-filled" v-model="songForm.title" clearable />
         <v-text-field
           type="number"
           label="Minutes"
@@ -168,10 +224,17 @@ onBeforeMount(async () => {
           variant="solo-filled"
           v-model="songForm.seconds"
         />
-      </div>
-      <v-btn @click.prevent="addSong" type="submit" color="#C62828">Save</v-btn>
-    </div>
-  </div>
-  <v-btn>Create</v-btn>
-  <v-btn @click.prevent="submitAlbum">Submit</v-btn>
+        <v-btn @click.prevent="addSong" type="submit" color="#00897B">Add song</v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
+
+  <v-row justify="center">
+    <v-col cols="auto">
+      <v-btn v-if="userStore.isAdmin" color="#00897B" @click.prevent="createAlbum()">Update</v-btn>
+    </v-col>
+    <v-col cols="auto">
+      <v-btn color="#00897B" @click.prevent="submitRequest()">Submit request</v-btn>
+    </v-col>
+  </v-row>
 </template>

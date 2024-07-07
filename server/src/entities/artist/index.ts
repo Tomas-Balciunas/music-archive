@@ -13,7 +13,10 @@ export class Artist {
   name: string
 
   @Column('text', { nullable: true, default: null })
-  birth: Date | null
+  birth: string | null
+
+  @Column('text', { nullable: true, default: null })
+  origin: string | null
 
   @ManyToMany(() => Band, (band) => band.artists, {
     onDelete: 'CASCADE', onUpdate: 'CASCADE'
@@ -27,13 +30,14 @@ export class Artist {
 }
 
 export type ArtistBare = Omit<Artist, 'bands' | 'albums'>
-export type ArtistSimple = Omit<ArtistBare, 'birth'>
+export type ArtistSimple = Omit<ArtistBare, 'birth' | 'origin'>
 export type ArtistFull = Artist
 
 export const artistSchema = validates<ArtistBare>().with({
   id: z.number().int().positive(),
   name: z.string().min(1).max(200),
-  birth: z.date().nullable(),
+  birth: z.string().nullable(),
+  origin: z.string().min(1).max(200).nullable(),
 })
 
 export const artistSearchSchema = artistSchema.pick({ name: true }).extend({

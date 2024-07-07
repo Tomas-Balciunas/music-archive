@@ -14,6 +14,7 @@ it('should get an update request', async () => {
   const data: ArtistUpdate = {
     name: 'John',
     birth: null,
+    origin: 'Country'
   }
 
   const { keys } = relationsSeparator(data)

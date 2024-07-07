@@ -71,7 +71,7 @@ onBeforeMount(() => {
       </div>
 
       <div>
-        <v-btn type="submit" color="#00897B">Save</v-btn>
+        <v-btn type="submit" color="#00897B">Submit to queue</v-btn>
       </div>
     </form>
   </div>

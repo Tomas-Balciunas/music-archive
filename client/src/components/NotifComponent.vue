@@ -36,7 +36,7 @@ const active = ref(false)
   bottom: 0;
   width: 100%;
   position: fixed;
-  z-index: 1005;
+  z-index: 2005;
   font-family: Verdana, Geneva, Tahoma, sans-serif;
 }
 </style>
