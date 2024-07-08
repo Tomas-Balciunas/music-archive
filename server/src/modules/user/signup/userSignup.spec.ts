@@ -15,6 +15,7 @@ it('should return access token', async () => {
     username: 'username',
     email: EMAIL,
     password: PW,
+    role: 1
   }
 
   const { signup } = createCaller({ db })
@@ -37,6 +38,7 @@ it('should throw error on duplicate email', async () => {
     username: 'username',
     email: EMAIL,
     password: PW,
+    role: 1
   }
 
   const { signup } = createCaller({ db })
