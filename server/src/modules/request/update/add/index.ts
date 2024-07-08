@@ -4,7 +4,7 @@ import {
 } from '@server/entities/request/update'
 import { authProcedure } from '@server/trpc/procedures'
 import { TRPCError } from '@trpc/server'
-import { pendingCheck } from '@server/trpc/middlewares'
+import { pendingCheckUpdate } from '@server/trpc/middlewares'
 import {
   areChanges,
   entityGet,
@@ -14,7 +14,7 @@ import {
 
 export default authProcedure
   .input(insertUpdateSchema)
-  .use(pendingCheck)
+  .use(pendingCheckUpdate)
   .mutation(async ({ input, ctx: { db, authUser } }) => {
     const { entity, entityId, info, ...data } = input
     const userId = authUser.id

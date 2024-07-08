@@ -16,14 +16,15 @@ import router from '..'
 
 const createCaller = createCallerFactory(router)
 const db = await createTestDatabase()
-const user = await db.getRepository(User).save(fakeUser())
+const user = await db.getRepository(User).save(fakeUser({role: 2}))
 const band = await db.getRepository(Band).save(fakeBand())
 const artist = await db.getRepository(Artist).save(fakeArtist())
 const album = await db.getRepository(Album).save(fakeAlbum({ bandId: band.id }))
 
 it('should approve album update', async () => {
   const entity = 'ALBUM'
-  const { approve } = createCaller(authContext({ db }))
+
+  const { approve } = createCaller(authContext({ db }, user))
 
   const data = {
     title: 'Test',
@@ -57,7 +58,7 @@ it('should approve album update', async () => {
 
 it('should approve band update', async () => {
   const entity = 'BAND'
-  const { approve } = createCaller(authContext({ db }))
+  const { approve } = createCaller(authContext({ db }, user))
 
   const data = {
     name: 'Test',
@@ -85,7 +86,7 @@ it('should approve band update', async () => {
 
 it('should approve artist update', async () => {
   const entity = 'ARTIST'
-  const { approve } = createCaller(authContext({ db }))
+  const { approve } = createCaller(authContext({ db }, user))
 
   const data = {
     name: 'Test',

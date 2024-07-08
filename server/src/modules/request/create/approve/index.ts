@@ -6,7 +6,7 @@ import {
 } from '@server/entities/request/create'
 import { createAlbum } from '@server/modules/album/services'
 import { createArtist } from '@server/modules/artist/services'
-import { authProcedure } from '@server/trpc/procedures'
+import { adminProcedure } from '@server/trpc/procedures'
 import { DataSource } from 'typeorm'
 import { getRequest } from '../../services'
 
@@ -20,7 +20,7 @@ const entities: {
   ARTIST: createArtist,
 }
 
-export default authProcedure
+export default adminProcedure
   .input(reqCreateSchema.pick({ id: true, entity: true }))
   .mutation(async ({ input, ctx: { db } }) => {
     const { id, entity } = input

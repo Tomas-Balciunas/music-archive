@@ -49,11 +49,5 @@ export const artistSearchSchema = artistSchema.pick({ name: true }).extend({
 export const artistInsertSchema = artistSchema.omit({ id: true })
 export const artistUpdateSchema = artistSchema.omit({ id: true })
 
-export const artistAddSchema = z.object({
-  albumId: z.number().int().positive().optional(),
-  bandId: z.number().int().positive().optional(),
-  artistId: z.number().int().positive(),
-})
-
 export type ArtistInsert = z.infer<typeof artistInsertSchema>
 export type ArtistUpdate = z.infer<typeof artistUpdateSchema>

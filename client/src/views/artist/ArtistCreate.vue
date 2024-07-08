@@ -56,49 +56,51 @@ onBeforeMount(() => {
 </script>
 
 <template>
-  <div>
-    <form @submit.prevent="createArtist">
-      <div>
-        <h4>Create a new artist</h4>
+  <v-container>
+    <div>
+      <h4>Create a new artist</h4>
 
-        <div class="mt-6">
-          <v-text-field
-            type="text"
-            v-model="artistForm.name"
-            variant="solo-filled"
-            placeholder="Artist name"
-          />
-        </div>
-        <div>
-          <v-date-input
-            label="Date of birth (optional)"
-            v-model="artistForm.birth"
-            clearable
-            @click:clear="artistForm.birth = null"
-          ></v-date-input>
-        </div>
-        <div class="mt-6">
-          <v-select
-            clearable
-            v-model="artistForm.origin"
-            :items="countryList"
-            variant="solo-filled"
-            label="Place of birth (optional)"
-          ></v-select>
-        </div>
-        <v-textarea
-          v-model="info"
-          label="Provide source(s) and/or clarification."
+      <div class="mt-6">
+        <v-text-field
+          type="text"
+          v-model="artistForm.name"
           variant="solo-filled"
-        ></v-textarea>
+          placeholder="Artist name"
+        />
       </div>
+      <div>
+        <v-date-input
+          label="Date of birth (optional)"
+          v-model="artistForm.birth"
+          clearable
+          @click:clear="artistForm.birth = null"
+        ></v-date-input>
+      </div>
+      <div class="mt-6">
+        <v-select
+          clearable
+          v-model="artistForm.origin"
+          :items="countryList"
+          variant="solo-filled"
+          label="Place of birth (optional)"
+        ></v-select>
+      </div>
+      <v-textarea
+        v-model="info"
+        label="Provide source(s) and/or clarification."
+        variant="solo-filled"
+      ></v-textarea>
+    </div>
 
-      <div>
-        <v-btn v-if="userStore.isAdmin" @click.prevent="createArtist" type="submit" color="#00897B">Create</v-btn>
-      </div>
-      <div>
+    <v-row justify="center">
+      <v-col cols="auto">
+        <v-btn v-if="userStore.isAdmin" @click.prevent="createArtist" type="submit" color="#00897B"
+          >Create</v-btn
+        >
+      </v-col>
+      <v-col cols="auto">
         <v-btn @click.prevent="submitArtist" type="submit" color="#00897B">Submit request</v-btn>
-      </div>
-    </form>
-  </div>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>

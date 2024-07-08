@@ -4,12 +4,14 @@ import { computed, onBeforeMount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { tryCatch } from '@/composables'
 import { getCountryDataList } from 'countries-list'
+import { useUserStore } from '@/stores/user'
 
 const artist = ref()
 const route = useRoute()
 const artistId = Number(route.params.id)
 const countryList = ref<string[]>([])
 const router = useRouter()
+const userStore = useUserStore()
 
 const info = ref('')
 
@@ -88,7 +90,15 @@ onBeforeMount(async () => {
       variant="solo-filled"
     ></v-textarea>
 
-    <v-btn @click.prevent="submitChanges()">Update</v-btn>
-    <v-btn @click.prevent="submitRequest()">Submit</v-btn>
+    <v-row justify="center">
+      <v-col cols="auto">
+        <v-btn v-if="userStore.isAdmin" color="#00897B" @click.prevent="submitChanges()"
+          >Update</v-btn
+        >
+      </v-col>
+      <v-col cols="auto">
+        <v-btn color="#00897B" @click.prevent="submitRequest()">Submit request</v-btn>
+      </v-col>
+    </v-row>
   </div>
 </template>

@@ -45,7 +45,10 @@ export const useUserStore = defineStore('user', () => {
     clearStoredAccessToken(localStorage)
   }
 
-  async function signup(userSignup: { username: string; email: string; password: string }) {
+  // REMOVE ROLE AFTER REVIEW
+  // REMOVE ROLE AFTER REVIEW
+  // REMOVE ROLE AFTER REVIEW
+  async function signup(userSignup: { username: string; email: string; password: string, role: number }) {
     await trpc.user.signup.mutate(userSignup)
   }
 

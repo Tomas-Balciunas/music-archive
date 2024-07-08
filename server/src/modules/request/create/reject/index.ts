@@ -1,7 +1,7 @@
 import { RequestCreate, reqCreateSchema } from '@server/entities/request/create'
-import { authProcedure } from '@server/trpc/procedures'
+import { adminProcedure } from '@server/trpc/procedures'
 
-export default authProcedure
+export default adminProcedure
   .input(reqCreateSchema.shape.id)
   .mutation(async ({ input: rId, ctx: { db } }) => {
     const rejectedRequest = await db

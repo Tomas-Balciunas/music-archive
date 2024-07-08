@@ -1,8 +1,8 @@
 import { bandIdSchema, bandUpdateSchema } from '@server/entities/band'
-import { authProcedure } from '@server/trpc/procedures'
+import { adminProcedure } from '@server/trpc/procedures'
 import { updateBand } from '../services'
 
-export default authProcedure
+export default adminProcedure
   .input(
     bandUpdateSchema.extend({
       bandId: bandIdSchema.shape.id,

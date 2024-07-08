@@ -16,11 +16,12 @@ const createCaller = createCallerFactory(router)
 it('should approve album create', async () => {
   const entity = 'ALBUM'
   const db = await createTestDatabase()
-  const { approve } = createCaller(authContext({ db }))
 
-  const user = await db.getRepository(User).save(fakeUser())
+  const user = await db.getRepository(User).save(fakeUser({role: 2}))
   const band = await db.getRepository(Band).save(fakeBand())
   const artist = await db.getRepository(Artist).save(fakeArtist())
+
+  const { approve } = createCaller(authContext({ db }, user))
 
   const data = {
     title: 'Test',

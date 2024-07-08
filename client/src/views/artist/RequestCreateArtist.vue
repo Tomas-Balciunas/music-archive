@@ -1,22 +1,25 @@
 <script lang="ts" setup>
-import { tryCatch } from '@/composables';
+import { tryCatch } from '@/composables'
 import { trpc } from '@/trpc'
 import { onBeforeMount, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
+const router = useRouter()
 const rId = Number(route.params.id)
 const r = ref()
 
 const approveChanges = async () => {
   tryCatch(async () => {
-    await trpc.request.create.approve.mutate({ id: rId, entity: 'ARTIST' })
+    await trpc.request.create.approve.mutate({ id: rId, entity: r.value.entity })
+    router.push({ name: 'Requests', query: { entity: 'artist', request: 'create' } })
   })
 }
 
 const rejectChanges = async () => {
   tryCatch(async () => {
     await trpc.request.create.reject.mutate(rId)
+    router.push({ name: 'Requests', query: { entity: 'artist', request: 'create' } })
   })
 }
 
@@ -28,15 +31,30 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <div v-if="r">
-    <h3>name: {{ r.data.name }}</h3>
-    <h3>birth: {{ r.data.birth ?? 'N/A' }}</h3>
-    <h3>country: {{ r.data.origin ?? 'N/A' }}</h3>
+  <v-container v-if="r">
+    <p>Artist data:</p>
+    <v-container>
+      <v-card variant="text" rounded="0">
+        <v-card-item>
+          <v-card-title> Name: {{ r.data.name }} </v-card-title>
+          <v-card-title> Birth: {{ r.data.birth ?? 'N/A' }} </v-card-title>
+          <v-card-title> Country: {{ r.data.origin ?? 'N/A' }} </v-card-title>
+        </v-card-item>
+      </v-card>
+    </v-container>
+
     <div>
-      <h4>Sources/explanation:</h4>
+      <p>Reason and sources:</p>
       <p>{{ r.info }}</p>
     </div>
-    <v-btn @click.prevent="approveChanges">Approve</v-btn>
-    <v-btn @click.prevent="rejectChanges">Reject</v-btn>
-  </div>
+
+    <v-row justify="center">
+      <v-col cols="auto">
+        <v-btn color="#00897B" @click.prevent="approveChanges()">Approve</v-btn>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn color="#B71C1C" @click.prevent="rejectChanges()">Reject</v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>

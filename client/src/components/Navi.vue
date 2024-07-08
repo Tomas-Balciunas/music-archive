@@ -22,18 +22,30 @@ function logoutUser() {
 
     <v-app-bar-title> <span class="navTitle">Music Archive</span> </v-app-bar-title>
 
-    <v-btn v-if="userStore.isLoggedIn" @click.prevent="logoutUser" icon>
-      <v-icon>mdi-logout</v-icon>
-    </v-btn>
+    <v-tooltip v-if="userStore.isLoggedIn" text="Logout" location="bottom">
+      <template v-slot:activator="{ props }">
+        <v-btn v-bind="props" @click.prevent="logoutUser" icon>
+          <v-icon>mdi-logout</v-icon>
+        </v-btn>
+      </template>
+    </v-tooltip>
 
     <div v-else>
-      <v-btn :to="{ name: 'Login' }" icon>
-        <v-icon>mdi-login</v-icon>
-      </v-btn>
+      <v-tooltip text="Login" location="bottom">
+        <template v-slot:activator="{ props }">
+          <v-btn v-bind="props" :to="{ name: 'Login' }" icon>
+            <v-icon>mdi-login</v-icon>
+          </v-btn>
+        </template>
+      </v-tooltip>
 
-      <v-btn :to="{ name: 'Signup' }" icon>
-        <v-icon>mdi-file-sign</v-icon>
-      </v-btn>
+      <v-tooltip text="Signup" location="bottom">
+        <template v-slot:activator="{ props }">
+          <v-btn v-bind="props" :to="{ name: 'Signup' }" icon>
+            <v-icon>mdi-file-sign</v-icon>
+          </v-btn>
+        </template>
+      </v-tooltip>
     </div>
   </v-app-bar>
 
@@ -41,7 +53,7 @@ function logoutUser() {
     <v-list>
       <v-list-item
         prepend-avatar="https://icons.veryicon.com/png/o/internet--web/three-body-project-icon/user-126.png"
-        :title="userStore.userIdentifier?.username ?? 'Guest'"
+        :title="userStore.isLoggedIn ? userStore.userIdentifier?.username : 'Guest'"
       ></v-list-item>
     </v-list>
 
@@ -73,10 +85,10 @@ function logoutUser() {
 <style>
 .navi {
   font-family: Verdana, Geneva, Tahoma, sans-serif;
-  font-size: 18px
+  font-size: 18px;
 }
 .navTitle {
-  color: #B71C1C;
+  color: #b71c1c;
   font-size: xx-large;
 }
 </style>

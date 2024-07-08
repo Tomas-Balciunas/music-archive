@@ -7,7 +7,7 @@ import {
 import { updateAlbum } from '@server/modules/album/services'
 import { updateArtist } from '@server/modules/artist/services'
 import { updateBand } from '@server/modules/band/services'
-import { authProcedure } from '@server/trpc/procedures'
+import { adminProcedure } from '@server/trpc/procedures'
 import { DataSource } from 'typeorm'
 import { getRequest } from '../../services'
 
@@ -23,7 +23,7 @@ const entities: {
   BAND: updateBand,
 }
 
-export default authProcedure
+export default adminProcedure
   .input(reqUpdateSchema.pick({ id: true, entity: true }))
   .mutation(async ({ input, ctx: { db } }) => {
     const { id, entity } = input

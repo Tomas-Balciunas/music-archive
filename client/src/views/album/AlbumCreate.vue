@@ -111,12 +111,23 @@ onBeforeMount(async () => {
 
 <template>
   <v-container v-if="band">
-    <v-row>
-      <v-col cols="auto">
-        <RouterLink :to="{ name: 'Band', params: { id: band.id } }">
-          <h2 class="text-amber">{{ band.name }}</h2>
-        </RouterLink>
-      </v-col>
+    <v-row v-if="band.pending">
+      <v-alert type="warning" class="text-h6">
+        Band is in pending state, only admins can update data.
+      </v-alert>
+    </v-row>
+    <v-row align-sm="center" justify="space-between">
+      <div class="d-flex align-center">
+        <v-col>
+          <h2 class="text-amber mr-2">{{ band.name }}</h2>
+        </v-col>
+
+        <v-tooltip v-if="band.pending" text="Band is awaiting approval." location="bottom">
+          <template v-slot:activator="{ props }">
+            <v-icon v-bind="props" icon="mdi-receipt-clock-outline"></v-icon>
+          </template>
+        </v-tooltip>
+      </div>
     </v-row>
 
     <v-row dense>

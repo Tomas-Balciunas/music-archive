@@ -10,7 +10,19 @@ const userForm = ref({
   username: '',
   email: '',
   password: '',
+  role: 1,
 })
+
+const roles = [
+  {
+    title: 'user',
+    role: 1,
+  },
+  {
+    title: 'admin',
+    role: 2,
+  },
+]
 
 const router = useRouter()
 const notifStore = useNotifStore()
@@ -36,6 +48,14 @@ async function submitSignup() {
       variant="solo-filled"
       v-model="userForm.password"
     />
+
+    <!-- REMOVE ROLE AFTER REVIEW -->
+     <!-- REMOVE ROLE AFTER REVIEW -->
+      <!-- REMOVE ROLE AFTER REVIEW -->
+
+    <span>for review and testing purposes, you may choose role</span>
+    <v-select :items="roles" item-title="title" item-value="role" v-model="userForm.role">
+    </v-select>
 
     <div class="grid">
       <v-btn color="#00897B" type="submit">Sign Up</v-btn>

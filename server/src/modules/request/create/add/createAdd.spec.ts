@@ -39,7 +39,7 @@ it('should create an artist create request', async () => {
 it('should create an album create request', async () => {
   const db = await createTestDatabase()
   const user = await db.getRepository(User).save(fakeUser())
-  const band = await db.getRepository(Band).save(fakeBand())
+  const band = await db.getRepository(Band).save(fakeBand({pending: false}))
   const artist = await db.getRepository(Artist).save(fakeArtist())
 
   const { add } = createCaller(authContext({ db }, user))

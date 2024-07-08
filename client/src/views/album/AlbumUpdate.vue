@@ -8,6 +8,7 @@ import { useUserStore } from '@/stores/user'
 import { useNotifStore } from '@/stores/notif'
 
 const album = ref()
+const name = ref('')
 const userStore = useUserStore()
 const notifStore = useNotifStore()
 const currentArtists = ref()
@@ -108,6 +109,7 @@ function submitRequest() {
 onBeforeMount(async () => {
   tryCatch(async () => {
     const { artists, songs, ...data } = await trpc.album.get.query(albumId)
+    name.value = data.title
     currentArtists.value = artists
     currentSongs.value = songs
     album.value = data
@@ -120,7 +122,7 @@ onBeforeMount(async () => {
     <v-row>
       <v-col cols="auto">
         <RouterLink :to="{ name: 'Album', params: { id: album.id } }">
-          <h2 class="text-amber">{{ album.title }}</h2>
+          <h2 class="text-amber">{{ name }}</h2>
         </RouterLink>
       </v-col>
     </v-row>

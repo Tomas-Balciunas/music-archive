@@ -1,6 +1,7 @@
 import { Band, User } from '@server/entities'
 import { TRPCError } from '@trpc/server'
 import { insertUpdateSchema } from '@server/entities/request/update'
+import { insertCreateSchema } from '@server/entities/request/create'
 import { middleware } from '..'
 import { getUserFromToken } from './utils'
 
@@ -69,12 +70,39 @@ export const adminMiddleware = authMidleware.unstable_pipe(
   }
 )
 
-export const pendingCheck = middleware(async ({ input, ctx: { db }, next }) => {
+export const pendingCheckUpdate = middleware(async ({ input, ctx: { db }, next }) => {
   const parsedInput = insertUpdateSchema.parse(input)
 
   if (parsedInput.entity === 'BAND') {
     const state = await db.getRepository(Band).findOne({
       where: { id: parsedInput.entityId },
+      select: { pending: true },
+    })
+
+    if (!state) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: 'Error: could not confirm pending state of the band.',
+      })
+    }
+
+    if (state.pending) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'Band is in pending state. Requests cannot be made.',
+      })
+    }
+  }
+
+  return next()
+})
+
+export const pendingCheckCreate = middleware(async ({ input, ctx: { db }, next }) => {
+  const parsedInput = insertCreateSchema.parse(input)
+
+  if (parsedInput.entity === 'ALBUM') {
+    const state = await db.getRepository(Band).findOne({
+      where: { id: parsedInput.bandId },
       select: { pending: true },
     })
 

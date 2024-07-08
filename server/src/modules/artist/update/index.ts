@@ -1,8 +1,8 @@
 import { artistSchema, artistUpdateSchema } from '@server/entities/artist'
-import { authProcedure } from '@server/trpc/procedures'
+import { adminProcedure } from '@server/trpc/procedures'
 import { updateArtist } from '../services'
 
-export default authProcedure
+export default adminProcedure
   .input(
     artistUpdateSchema.extend({
       id: artistSchema.shape.id,

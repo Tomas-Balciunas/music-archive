@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { authenticate } from './guards'
+import { authenticate, loggedIn } from './guards'
 
 const routes = [
   {
@@ -43,11 +43,13 @@ const routes = [
   {
     path: '/login',
     name: 'Login',
+    beforeEnter: [loggedIn],
     component: () => import('../views/LoginView.vue'),
   },
   {
     path: '/signup',
     name: 'Signup',
+    beforeEnter: [loggedIn],
     component: () => import('../views/SignupView.vue'),
   },
   {
@@ -58,16 +60,19 @@ const routes = [
   {
     path: '/requests',
     name: 'Requests',
+    beforeEnter: [authenticate],
     component: () => import('../views/RequestsView.vue'),
   },
   {
     path: '/requests/band/update/:id',
     name: 'BandUpdateReq',
+    beforeEnter: [authenticate],
     component: () => import('../views/band/RequestUpdateBand.vue'),
   },
   {
     path: '/band/update/:id',
     name: 'BandUpdate',
+    beforeEnter: [authenticate],
     component: () => import('../views/band/BandUpdate.vue'),
   },
   {
@@ -85,6 +90,7 @@ const routes = [
   {
     path: '/album/update/:id',
     name: 'AlbumUpdate',
+    beforeEnter: [authenticate],
     component: () => import('../views/album/AlbumUpdate.vue'),
   },
   {
@@ -96,16 +102,19 @@ const routes = [
   {
     path: '/requests/album/update/:id',
     name: 'AlbumUpdateReq',
+    beforeEnter: [authenticate],
     component: () => import('../views/album/RequestUpdateAlbum.vue'),
   },
   {
     path: '/artist/update/:id',
     name: 'ArtistUpdate',
+    beforeEnter: [authenticate],
     component: () => import('../views/artist/ArtistUpdate.vue'),
   },
   {
     path: '/requests/artist/update/:id',
     name: 'ArtistUpdateReq',
+    beforeEnter: [authenticate],
     component: () => import('../views/artist/RequestUpdateArtist.vue'),
   },
 ]

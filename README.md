@@ -1,9 +1,7 @@
 
 # Music Archive
 
-An app to store all relevant information about music bands. This archive is going to be community driven - users will be able to modify/create information which is going to be reviewed by administrators before committing the new information.
-
-Current version provides crude front-end, so you can freely browse and add data. Adding entries requires authentication.
+An app hosting information about music bands. This archive is community driven - users are able to make update or create requests which then are going to go into a queue. Requests are reviewed by administrators - they can be rejected or approved, committing them to database.
 
 # Setting Up
 

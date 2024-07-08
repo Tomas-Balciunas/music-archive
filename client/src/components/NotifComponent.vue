@@ -7,11 +7,17 @@ const notif = useNotifStore()
 watch(
   () => notif.notif,
   () => {
-    active.value = true
+    if (notif.notif !== '') {
+      active.value = true
+    }
   }
 )
 
 const active = ref(false)
+
+const closeNotif = () => {
+  notif.notif = ''
+}
 </script>
 
 <template>
@@ -23,7 +29,7 @@ const active = ref(false)
       color="amber"
       title="Alert title"
       closable
-      @click:close="active = false"
+      @click:close="closeNotif"
     >
       <template v-slot:title>
         {{ notif.getNotif }}

@@ -9,6 +9,7 @@ import { useNotifStore } from '@/stores/notif'
 import { useUserStore } from '@/stores/user'
 
 const band = ref()
+const name = ref('')
 const notifStore = useNotifStore()
 const userStore = useUserStore()
 const currentArtists = ref()
@@ -78,6 +79,7 @@ onBeforeMount(async () => {
     countryList.value = getCountryDataList().map((c) => c.name)
     const { artists, ...data } = await trpc.band.get.query(bandId)
     currentArtists.value = artists
+    name.value = data.name
     band.value = data
   })
 })
@@ -85,12 +87,20 @@ onBeforeMount(async () => {
 
 <template>
   <v-container v-if="band">
-    <v-row>
-      <v-col cols="auto">
-        <RouterLink :to="{ name: 'Band', params: { id: band.id } }">
-          <h2 class="text-amber">{{ band.name }}</h2>
-        </RouterLink>
-      </v-col>
+    <v-row v-if="band.pending">
+      <v-alert type="warning" class="text-h6">
+        Band is in pending state, only admins can update data.
+      </v-alert>
+    </v-row>
+    <v-row align-sm="center" justify="space-between">
+      <div class="d-flex align-center">
+        <h1 class="text-amber mr-2">{{ name }}</h1>
+        <v-tooltip v-if="band.pending" text="Band is awaiting approval." location="bottom">
+          <template v-slot:activator="{ props }">
+            <v-icon v-bind="props" icon="mdi-receipt-clock-outline"></v-icon>
+          </template>
+        </v-tooltip>
+      </div>
     </v-row>
 
     <v-row dense>

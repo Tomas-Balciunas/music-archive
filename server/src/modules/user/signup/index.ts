@@ -5,15 +5,20 @@ import config from '@server/config'
 import { userSchema } from '@server/entities/user'
 import { TRPCError } from '@trpc/server'
 
+// REMOVE ROLE AFTER REVIEW
+// REMOVE ROLE AFTER REVIEW
+// REMOVE ROLE AFTER REVIEW
+
 export default publicProcedure
   .input(
     userSchema.pick({
       username: true,
       email: true,
       password: true,
+      role: true
     })
   )
-  .mutation(async ({ input: { username, email, password }, ctx: { db } }) => {
+  .mutation(async ({ input: { username, email, password, role }, ctx: { db } }) => {
     const hash = await bcrypt.hash(password, config.auth.passwordCost)
 
     try {
@@ -21,6 +26,7 @@ export default publicProcedure
         username,
         email,
         password: hash,
+        role
       })
 
       return {

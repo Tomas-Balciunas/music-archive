@@ -32,9 +32,8 @@ const approveBand = async () => {
 
     tryCatch(async () => {
       await trpc.band.status.mutate({ id: bandValue.id, pending: false })
+      router.push({ name: 'Requests', query: { entity: 'band', request: 'create' } })
     })
-
-    router.push({ name: 'Requests' })
   }
 }
 
@@ -53,11 +52,25 @@ onBeforeMount(async () => {
 
 <template>
   <v-container v-if="band">
+    <v-row v-if="band.pending">
+      <v-alert type="warning" class="text-h6">
+        Band is in pending state, only admins can update data.
+      </v-alert>
+    </v-row>
     <v-row align-sm="center" justify="space-between">
-      <h1 class="text-amber">{{ band.name }}</h1>
+      <div class="d-flex align-center">
+        <h2 class="text-amber mr-2">{{ band.name }}</h2>
+        <v-tooltip v-if="band.pending" text="Band is awaiting approval." location="bottom">
+          <template v-slot:activator="{ props }">
+            <v-icon v-bind="props" icon="mdi-receipt-clock-outline"></v-icon>
+          </template>
+        </v-tooltip>
+      </div>
 
       <div>
-        <v-btn class="mr-2" color="#00897B" :to="{ name: 'BandUpdate', params: { id: bandId } }">Update</v-btn>
+        <v-btn class="mr-2" color="#00897B" :to="{ name: 'BandUpdate', params: { id: bandId } }"
+          >Update</v-btn
+        >
         <v-btn color="#00897B" v-if="band.pending" @click.prevent="approveBand">Approve</v-btn>
       </div>
     </v-row>
@@ -165,10 +178,10 @@ onBeforeMount(async () => {
       </v-col>
     </v-row>
 
-    <v-row>
-      <p>Add user comment</p>
-    </v-row>
     <v-container v-if="!band.pending && userStore.isLoggedIn">
+      <v-row>
+        <p>Add user comment</p>
+      </v-row>
       <v-row>
         <v-col cols="8 ">
           <v-textarea rows="2" variant="solo-filled" v-model="postForm.body"></v-textarea>

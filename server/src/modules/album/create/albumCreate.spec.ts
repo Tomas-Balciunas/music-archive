@@ -7,7 +7,7 @@ import router from '..'
 
 const createCaller = createCallerFactory(router)
 const db = await createTestDatabase()
-const user = await db.getRepository(User).save(fakeUser())
+const user = await db.getRepository(User).save(fakeUser({role: 2}))
 const band = await db.getRepository(Band).save(fakeBand())
 
 it('should create an album', async () => {

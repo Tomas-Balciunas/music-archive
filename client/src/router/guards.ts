@@ -8,3 +8,19 @@ export const authenticate = () => {
 
   return true
 }
+
+export const loggedIn = () => {
+  const userStore = useUserStore()
+
+  if (userStore.isLoggedIn) return { name: 'Home' }
+
+  return true
+}
+
+export const authorize = () => {
+  const userStore = useUserStore()
+
+  if (!userStore.isAdmin) return { name: 'Home' }
+
+  return true
+}

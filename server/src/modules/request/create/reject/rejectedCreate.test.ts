@@ -9,18 +9,17 @@ const createCaller = createCallerFactory(router)
 
 it('should reject a request', async () => {
   const db = await createTestDatabase()
-  const { reject } = createCaller(authContext({ db }))
-  const user = await db.getRepository(User).save(fakeUser())
+  const user = await db.getRepository(User).save(fakeUser({role: 2}))
 
-  const request = await db
-    .getRepository(RequestCreate)
-    .save(
-      fakeRequest({
-        userId: user.id,
-        entity: 'ARTIST',
-        data: 'dummy',
-      })
-    )
+  const { reject } = createCaller(authContext({ db }, user))
+
+  const request = await db.getRepository(RequestCreate).save(
+    fakeRequest({
+      userId: user.id,
+      entity: 'ARTIST',
+      data: 'dummy',
+    })
+  )
 
   await reject(request.id)
 

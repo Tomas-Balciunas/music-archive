@@ -1,8 +1,8 @@
-import { authProcedure } from '@server/trpc/procedures'
+import { adminProcedure } from '@server/trpc/procedures'
 import { albumSchema, albumUpdateSchema } from '@server/entities/album'
 import { updateAlbum } from '../services'
 
-export default authProcedure
+export default adminProcedure
   .input(albumUpdateSchema.extend({ id: albumSchema.shape.id }))
   .mutation(async ({ input, ctx: { db } }) => {
     const { id, ...data } = input

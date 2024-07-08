@@ -1,8 +1,8 @@
 import { Band, bandSchema } from "@server/entities/band";
-import { authProcedure } from "@server/trpc/procedures";
+import { adminProcedure } from "@server/trpc/procedures";
 import { z } from "zod";
 
-export default authProcedure
+export default adminProcedure
 .input(bandSchema.pick({id: true}).extend({
     pending: z.boolean()
 }))

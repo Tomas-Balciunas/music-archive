@@ -13,14 +13,14 @@ const a = ref()
 const approveChanges = async () => {
   tryCatch(async () => {
     await trpc.request.update.approve.mutate({ id: r.value.id, entity: 'ALBUM' })
-    router.push({ name: 'Requests' })
+    router.push({ name: 'Requests', query: { entity: 'album', request: 'update' } })
   })
 }
 
 const rejectChanges = async () => {
   tryCatch(async () => {
     await trpc.request.update.reject.mutate(rId)
-    router.push({ name: 'Requests' })
+    router.push({ name: 'Requests', query: { entity: 'album', request: 'update' } })
   })
 }
 
@@ -59,7 +59,7 @@ onBeforeMount(async () => {
     </v-container>
 
     <v-container v-if="r.artists.length">
-      <p>Artists:</p>
+      <p>New artists:</p>
       <v-card
         variant="text"
         rounded="0"
@@ -75,7 +75,7 @@ onBeforeMount(async () => {
     </v-container>
 
     <v-container v-if="r.songs.length">
-      <p>songs:</p>
+      <p>New songs:</p>
       <v-card variant="text" rounded="0" class="lists" v-for="song in r.songs" :key="song.id">
         <v-card-item>
           <v-card-title> {{ song.title }} {{ toMinutes(song.duration) }} </v-card-title>
@@ -84,7 +84,7 @@ onBeforeMount(async () => {
     </v-container>
 
     <div>
-      <p>Sources:</p>
+      <p>Reason and sources:</p>
       <p>{{ r.info }}</p>
     </div>
 
@@ -93,7 +93,7 @@ onBeforeMount(async () => {
         <v-btn color="#00897B" @click.prevent="approveChanges()">Approve</v-btn>
       </v-col>
       <v-col cols="auto">
-        <v-btn color="#00897B" @click.prevent="rejectChanges()">Reject</v-btn>
+        <v-btn color="#B71C1C" @click.prevent="rejectChanges()">Reject</v-btn>
       </v-col>
     </v-row>
   </v-container>

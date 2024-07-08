@@ -34,7 +34,7 @@ onBeforeMount(async () => {
       <h1 class="text-amber">{{ album.title }}</h1>
 
       <div>
-        <v-btn :to="{ name: 'AlbumUpdate', params: { id: albumId } }">Update</v-btn>
+        <v-btn color="#00897B" :to="{ name: 'AlbumUpdate', params: { id: albumId } }">Update</v-btn>
       </div>
     </v-row>
 

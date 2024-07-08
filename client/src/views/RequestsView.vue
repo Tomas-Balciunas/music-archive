@@ -5,11 +5,48 @@ import AlbumCreateList from '@/components/requests/lists/AlbumCreateList.vue'
 import ArtistCreateList from '@/components/requests/lists/ArtistCreateList.vue'
 import AlbumUpdateList from '@/components/requests/lists/AlbumUpdateList.vue'
 import ArtistUpdateList from '@/components/requests/lists/ArtistUpdateList.vue'
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter, type LocationQueryValue } from 'vue-router'
 
-const tab = ref('')
-const updates = ref('')
-const creates = ref('')
+const route = useRoute()
+const router = useRouter()
+
+const tab = ref(route.query.request || 'create')
+const creates = ref(route.query.entity)
+const updates = ref(route.query.entity)
+
+const updateQueryParam = (
+  entity: string | LocationQueryValue | LocationQueryValue[],
+  request: string | LocationQueryValue | LocationQueryValue[]
+) => {
+  router.push({ query: { entity, request } })
+}
+
+watch(
+  () => route.query.request,
+  (request) => {
+    tab.value = request || 'create'
+  }
+)
+
+watch([tab, creates, updates], ([newTab, newCreate, newUpdate]) => {
+  if (newTab === 'create') {
+    updateQueryParam(newCreate, 'create')
+  }
+  if (newTab === 'update') {
+    updateQueryParam(newUpdate, 'update')
+  }
+})
+
+onMounted(() => {
+  if (route.query.request) {
+    updateQueryParam(route.query.entity, route.query.request)
+  }
+
+  if (route.query.request) {
+    updateQueryParam(route.query.entity, route.query.request)
+  }
+})
 </script>
 
 <template>
