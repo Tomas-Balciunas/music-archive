@@ -7,7 +7,7 @@ import router from '..'
 
 const createCaller = createCallerFactory(router)
 const db = await createTestDatabase()
-const user = await db.getRepository(User).save(fakeUser())
+const user = await db.getRepository(User).save(fakeUser({role: 2}))
 const { get } = createCaller(authContext({ db }, user))
 
 it('should get an artist create request', async () => {
@@ -44,4 +44,8 @@ it('should get an album create request', async () => {
 
   expect(response).toMatchObject({ ...req, data, userId: user.id })
   expect(response.data).toMatchObject(data)
+})
+
+it('should throw an error when request is not found', async () => {
+  expect(get(999)).rejects.toThrow()
 })

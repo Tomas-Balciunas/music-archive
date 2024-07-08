@@ -37,7 +37,7 @@ export const artistSchema = validates<ArtistBare>().with({
   id: z.number().int().positive(),
   name: z.string().min(1).max(200),
   birth: z.string().nullable(),
-  origin: z.string().min(1).max(200).nullable(),
+  origin: z.string().max(200).nullable(),
 })
 
 export const artistSearchSchema = artistSchema.pick({ name: true }).extend({

@@ -10,9 +10,9 @@ import { createCallerFactory } from '@server/trpc'
 import router from '..'
 
 const createCaller = createCallerFactory(router)
+const db = await createTestDatabase()
 
 it('should get one review', async () => {
-  const db = await createTestDatabase()
   const band = await db.getRepository(Band).save(fakeBand())
   const userFake = await db.getRepository(User).save(fakeUser())
   const albumFake = await db
@@ -36,7 +36,7 @@ it('should get one review', async () => {
     title: review2.title,
     body: review2.body,
     score: review2.score,
-    albumId: review2.albumId
+    albumId: review2.albumId,
   })
   expect(bandClean).not.toMatchObject({
     id: expect.any(Number),
@@ -44,4 +44,20 @@ it('should get one review', async () => {
     body: review1.body,
     score: review1.score,
   })
+})
+
+it('should throw when no review is found', async () => {
+  const band = await db.getRepository(Band).save(fakeBand())
+  const userFake = await db.getRepository(User).save(fakeUser())
+  const albumFake = await db
+    .getRepository(Album)
+    .save(fakeAlbum({ bandId: band.id }))
+
+  const review = await db
+    .getRepository(Review)
+    .save(fakeReview({ albumId: albumFake.id, userId: userFake.id }))
+
+  const { get } = createCaller({ db })
+
+  expect(get(review.id + 1)).rejects.toThrow()
 })

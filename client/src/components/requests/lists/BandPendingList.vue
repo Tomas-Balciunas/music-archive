@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { tryCatch } from '@/composables';
 import { trpc } from '@/trpc'
+import { format } from 'date-fns'
 import { onBeforeMount, ref } from 'vue'
 
 const bands = ref()
@@ -21,7 +22,7 @@ onBeforeMount(async () => {
               <span>{{ b.name }}</span>
             </v-card-title>
             <v-card-subtitle>
-              {{ b.createdAt }}
+              Time created {{ format(new Date(b.createdAt), 'yyyy-MM-dd HH:mm:ss') }}
             </v-card-subtitle>
           </v-card-item>
         </v-card>

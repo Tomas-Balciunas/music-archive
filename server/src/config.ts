@@ -54,7 +54,8 @@ const schema = z
 
     pagination: z.object({
       bands: z.coerce.number().positive().min(1).default(8)
-    })
+    }),
+    maxUserPendingRequests: z.coerce.number().positive().min(1).default(10)
   })
   .readonly()
 
@@ -82,7 +83,8 @@ const config = schema.parse({
   },
   pagination: {
     bands: env.PAGINATION_BANDS || 8
-  }
+  },
+  maxUserPendingRequests: env.MAX_USER_PENDING_REQUESTS || 10
 })
 
 export default config

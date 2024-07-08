@@ -1,8 +1,8 @@
 import { RequestCreate, insertCreateSchema } from "@server/entities/request/create";
 import { pendingCheckCreate } from "@server/trpc/middlewares";
-import { authProcedure } from "@server/trpc/procedures";
+import { requestProcedure } from "@server/trpc/procedures";
 
-export default authProcedure
+export default requestProcedure
 .input(insertCreateSchema)
 .use(pendingCheckCreate)
 .mutation(async ({input, ctx: {db, authUser}}) => {

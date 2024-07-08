@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { tryCatch } from '@/composables'
 import { trpc } from '@/trpc'
+import { format } from 'date-fns'
 import { onBeforeMount, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 
@@ -22,7 +23,9 @@ onBeforeMount(async () => {
             <v-card-title>
               {{ req.data.name }}
             </v-card-title>
-            <v-card-subtitle> {{ req.createdAt }} </v-card-subtitle>
+            <v-card-subtitle>
+              Time created {{ format(new Date(req.createdAt), 'yyyy-MM-dd HH:mm:ss') }}
+            </v-card-subtitle>
           </v-card-item>
         </v-card>
       </RouterLink>

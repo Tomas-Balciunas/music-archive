@@ -13,12 +13,14 @@ export default authProcedure
       .getRepository(RequestUpdate)
       .createQueryBuilder('request_update')
       .leftJoin(eLower, eLower, `${eLower}.id = request_update.entity_id`)
+      .leftJoin('user', 'user', `user.id = request_update.user_id`)
       .where('request_update.entity = :entity', { entity })
       .andWhere('request_Update.status = :pending', { pending: 'pending' })
       .select([
         'request_update.id as id',
         'request_update.created_at as created_at',
         eLower,
+        'username'
       ])
       .orderBy('created_at')
       .getRawMany()

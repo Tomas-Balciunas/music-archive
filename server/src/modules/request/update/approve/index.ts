@@ -7,8 +7,9 @@ import {
 import { updateAlbum } from '@server/modules/album/services'
 import { updateArtist } from '@server/modules/artist/services'
 import { updateBand } from '@server/modules/band/services'
-import { adminProcedure } from '@server/trpc/procedures'
 import { DataSource } from 'typeorm'
+import { updateApprovalSequence } from '@server/trpc/middlewares'
+import { adminProcedure } from '@server/trpc/procedures'
 import { getRequest } from '../../services'
 
 const entities: {
@@ -25,6 +26,7 @@ const entities: {
 
 export default adminProcedure
   .input(reqUpdateSchema.pick({ id: true, entity: true }))
+  .use(updateApprovalSequence)
   .mutation(async ({ input, ctx: { db } }) => {
     const { id, entity } = input
     const repo = db.getRepository(RequestUpdate)

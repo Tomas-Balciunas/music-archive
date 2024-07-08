@@ -12,7 +12,7 @@ export default publicProcedure
     if (!review) {
       throw new TRPCError({
         code: 'NOT_FOUND',
-        message: `Band was not found`,
+        message: `Review was not found`,
       })
     }
 

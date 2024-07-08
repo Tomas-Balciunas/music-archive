@@ -16,7 +16,7 @@ import router from '..'
 
 const createCaller = createCallerFactory(router)
 const db = await createTestDatabase()
-const user = await db.getRepository(User).save(fakeUser({role: 2}))
+const user = await db.getRepository(User).save(fakeUser({ role: 2 }))
 const band = await db.getRepository(Band).save(fakeBand())
 const artist = await db.getRepository(Artist).save(fakeArtist())
 const album = await db.getRepository(Album).save(fakeAlbum({ bandId: band.id }))
@@ -102,6 +102,36 @@ it('should approve artist update', async () => {
   const updatedArtist = (await approve({ id: req.id, entity })) as ArtistBare
 
   expect(updatedArtist.name).not.toEqual(artist.name)
+})
+
+it('should throw an error if approving with preceding requests still pending', async () => {
+  const entity = 'ARTIST'
+  const { approve } = createCaller(authContext({ db }, user))
+
+  const data = {
+    name: 'Test',
+    birth: null,
+  }
+
+  const insert = updateInsert(entity, artist.id, data)
+
+  await db
+    .getRepository(RequestUpdate)
+    .save(fakeRequest({ ...insert, userId: user.id, createdAt: new Date('2000-01-01') }))
+
+
+  const latestRequest = await db
+    .getRepository(RequestUpdate)
+    .save(fakeRequest({ ...insert, userId: user.id, createdAt: new Date('2000-01-02') }))
+
+  expect(approve({ id: latestRequest.id, entity })).rejects.toThrow()
+})
+
+it('should throw an error if request is not found', async () => {
+  const entity = 'ARTIST'
+  const { approve } = createCaller(authContext({ db }, user))
+
+  expect(approve({ id: 999, entity })).rejects.toThrow()
 })
 
 function updateInsert(entity: string, entityId: number, data: object) {
